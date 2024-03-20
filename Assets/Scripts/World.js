@@ -19,7 +19,7 @@ const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight - 36,
-    backgroundColor: "blue",
+    backgroundColor: "green",
     scene: World,
 };
 

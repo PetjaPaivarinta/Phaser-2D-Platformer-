@@ -1,7 +1,5 @@
-import { Scene } from "phaser";
-
-class GameScene extends Scene
-{NP
+class World extends Phaser.Scene
+{
     constructor() {
         super({ key: 'GameScene' });
     }
@@ -17,6 +15,12 @@ class GameScene extends Scene
     }
 
 }
+const config = {
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight - 36,
+    scene: World,
+};
 
 
 const game = new Phaser.Game(config);

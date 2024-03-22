@@ -4,6 +4,7 @@ class World extends Phaser.Scene
         super({ key: 'GameScene' });
         this.player = null;    
     }
+
     
     preload()
     {
@@ -13,7 +14,7 @@ class World extends Phaser.Scene
 
 
         // load tilemap
-        this.load.tilemapTiledJSON('map', 'Assets/tilemaps/exported tiles.json');
+        this.load.tilemapTiledJSON('map', 'Assets/tilemaps/exported.json');
 
         // load the tileset image
         this.load.image('tiles', 'Assets/tilemaps/map.png');
@@ -21,27 +22,40 @@ class World extends Phaser.Scene
 
     create()
     {
-        // load the tilemap
+
+        this.counter = 0;
+
+        // is grounded
+        this.isPlayerOnGround = false;
+
+        // load the tilemap stuff
         const map = this.make.tilemap({ key: 'map' });
 
         // add the tileset image to the map
-        const tileset = map.addTilesetImage('new tileset grass', 'tiles');
+        const tileset = map.addTilesetImage('spritesheet', 'tiles');
 
         // create the layers
-       const layer = map.createLayer('Tile Layer 1', tileset, 0, 0);
+       const layer = map.createLayer('Tile Layer 1', tileset, 0, +200);
 
-        layer.setCollisionByProperty({ collides: true });
 
-        // create the score text
-            this.scoreText = this.add.text(this.cameras.main.scrollX + 10, this.cameras.main.scrollY + 10, 'Score: 0', { fontFamily: 'Comic Sans', fontSize: '100px', color: '#FF0000'});
-            this.scoreText.setScrollFactor(0);
+        //this.physics.add.collider(this.player, layer); // THIS BREAKS CODE DO NOT RUN
+        layer.setCollisionBetween(0, 100);
+
+        // create the score text and set it to follow the camera
+        this.scoreText = this.add.text(this.sys.game.config.width / 3, this.sys.game.config.height / 2.8, 'Score: 0', { fontSize: '200px', fill: '#000' });
+        this.scoreText.setScrollFactor(0);     
+        this.scoreText.setDepth(1);
+        this.scoreText.setScale(0.1);
+
+
             // create the player
             this.player = this.physics.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 1.5, 'start player');
-            this.player.setGravityY(400);
-            this.player.setCollideWorldBounds(true);
+            this.player.setGravityY(400)
             this.player.setScale(0.2)
 
-            this.physics.add.collider(this.player, layer);
+            this.physics.add.collider(this.player, layer, () => {
+                this.isPlayerOnGround = true;
+            }, null , this);
 
             // camera follow player
             this.cameras.main.startFollow(this.player);
@@ -51,18 +65,22 @@ class World extends Phaser.Scene
             this.cameras.main.setLerp(0.1, 0.1);
 
             // create the coin
-            this.coin = this.physics.add.image(300, 500, 'coin');
+            this.coin = this.physics.add.image(this.sys.game.config.width / 2 + 200, this.sys.game.config.height / 1.5, 'coin');
             this.coin.setGravityY(400);
-            this.coin.setCollideWorldBounds(true);
-            this.coin.setBounce(0.2);
+
+            this.coin.setBounce(0.6);
             this.coin.setInteractive();
-            this.coin.setScale(2.5);
+            this.coin.setScale(0.5);
+            this.physics.add.collider(this.coin, layer)
 
             this.score = 0;
 
         }
 
     update () {
+
+        this.counter++;
+
         // destroy coin, increase score, and update score text
         if (this.physics.overlap(this.player, this.coin)) {
             this.coin.destroy();
@@ -74,17 +92,23 @@ class World extends Phaser.Scene
         if (this.input.keyboard.addKey('A').isDown) {
             this.player.x -= 5;
             // swap the player image
+            if (this.counter % 25 === 0) {
             this.player.setTexture('second player');
+        }
         }
         if (this.input.keyboard.addKey('D').isDown) {
             this.player.x += 5;
             // swap the player image continuously when moving
-            this.player.setTexture('start player');
+            if (this.counter % 25 === 0) {
+                this.player.setTexture('start player');
+            }
         }
-        if (this.input.keyboard.addKey('Space').isDown) {
+        if (this.input.keyboard.addKey('Space').isDown && this.isPlayerOnGround) {
             // jump
             this.jump();
+            this.isPlayerOnGround = false;
         }
+    
     }
     jump() {
         this.player.setVelocityY(-400);
@@ -94,8 +118,7 @@ const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
     height: window.innerHeight - 36,
-    // green background
-    backgroundColor: 0x00FF00,
+    backgroundColor: '#3498db',
     physics: {
         default: 'arcade',
         arcade: {
@@ -107,7 +130,7 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: World,
+    scene: [Menu, World],
 };
 
 

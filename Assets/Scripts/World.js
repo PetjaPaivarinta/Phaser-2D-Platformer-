@@ -72,6 +72,7 @@ var height = this.cameras.main.height; // Corrected typo
         this.load.image('start player', 'Assets/Images/1st Player img.png');
         this.load.image('second player', 'Assets/Images/2nd Player img.png');
         this.load.image('coin', 'Assets/Images/coin.png');
+        this.load.audio('jump', 'Assets/Audio/jump.mp3');
 
         for (let i = 0; i < 100; i++) {
             this.load.image('coin' + i, 'Assets/Images/coin.png');
@@ -87,8 +88,8 @@ var height = this.cameras.main.height; // Corrected typo
 
     create()
     {
+        this.jumpSound = this.sound.add('jump');
 
-        this.counter = 0;
 
         // is grounded
         this.isPlayerOnGround = false;
@@ -144,7 +145,7 @@ var height = this.cameras.main.height; // Corrected typo
 
     update () {
 
-        this.counter++;
+     
 
         // destroy coin, increase score, and update score text
         if (this.physics.overlap(this.player, this.coin)) {
@@ -157,16 +158,12 @@ var height = this.cameras.main.height; // Corrected typo
         if (this.input.keyboard.addKey('A').isDown) {
             this.player.x -= 5;
             // swap the player image
-            if (this.counter % 25 === 0) {
             this.player.setTexture('second player');
-        }
         }
         if (this.input.keyboard.addKey('D').isDown) {
             this.player.x += 5;
             // swap the player image continuously when moving
-            if (this.counter % 25 === 0) {
                 this.player.setTexture('start player');
-            }
         }
         if (this.input.keyboard.addKey('Space').isDown && this.isPlayerOnGround) {
             // jump
@@ -177,6 +174,7 @@ var height = this.cameras.main.height; // Corrected typo
     }
     jump() {
         this.player.setVelocityY(-400);
+        this.jumpSound.play();
 }
 }
 const config = {

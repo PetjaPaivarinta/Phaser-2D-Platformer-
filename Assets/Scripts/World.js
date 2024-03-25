@@ -83,13 +83,14 @@ var height = this.cameras.main.height; // Corrected typo
         this.load.tilemapTiledJSON('map', 'Assets/tilemaps/exported.json');
 
         // load the tileset image
-        this.load.image('tiles', 'Assets/tilemaps/map.png');
+        this.load.image('tiles', 'Assets/tilemaps/map.png', { frameWidth: 32, frameHeight: 32 });
 
 
     }
 
     create()
     {
+        this.add.text(this.sys.game.config.width / 2, this.sys.game.config.height / 1.5 -50, 'Welcome to the Game', { fontFamily: 'Comic Sans', fontSize: '120px', color: '#ffffff', fontWeight: 'bold'}).setOrigin(0.5).setDepth(1).setScale(0.2);
         this.jumpSound = this.sound.add('jump');
 
 
@@ -105,11 +106,11 @@ var height = this.cameras.main.height; // Corrected typo
      
 
         // create the layers
-       const layer = map.createLayer('Tile Layer 1', tileset, 0, +200);
+       const layer = map.createLayer('Tile Layer 1', tileset, 0, 100);
+
+       
 
 
-
-        //this.physics.add.collider(this.player, layer); // this breaks tilemaps. DO NOT RUN, works fine without it
         layer.setCollisionBetween(0, 100);
 
         // create the score text and set it to follow the camera
@@ -121,19 +122,16 @@ var height = this.cameras.main.height; // Corrected typo
 
             // create the player
             this.player = this.physics.add.image(this.sys.game.config.width / 2, this.sys.game.config.height / 1.5, 'start player');
-            this.player.setGravityY(400)
             this.player.setScale(0.2)
 
             this.physics.add.collider(this.player, layer, () => {
                 this.isPlayerOnGround = true;
             }, null , this);
 
+
             // camera follow player
             this.cameras.main.startFollow(this.player);
-            this.cameras.main.setZoom(2.5);
-
-            // make the camera move on x axis when the player moves on x axis
-            this.cameras.main.setLerp(0.1, 0.1);
+            this.cameras.main.setZoom(2);
 
             // create the coin
             this.coin = this.physics.add.image(this.sys.game.config.width / 2 + 200, this.sys.game.config.height / 1.5, 'coin');
@@ -150,10 +148,30 @@ var height = this.cameras.main.height; // Corrected typo
 
             this.frameCounter = 0;
 
-        }
+            this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.isPaused = false;
+}
 
-    update () {
+update() {
 
+    if (Phaser.Input.Keyboard.JustDown(this.escapeKey) && !this.isPaused) {
+        this.scene.pause();
+        this.isPaused = true;
+        console.log('pause');
+
+        this.escapeKey.on('up', () => {
+            this.scene.resume();
+            this.isPaused = false;
+            console.log('resume');
+        }, this, true); // the third parameter is `once`, which means the event listener will be removed after being triggered
+    }
+
+    // zoom out camera when player jumps
+    if (!this.isPlayerOnGround) {
+        this.cameras.main.zoomTo(2, 200);
+    } else {
+        this.cameras.main.zoomTo(2.5, 200);
+    }
         this.frameCounter++;
 
         // destroy coin, increase score, and update score text
@@ -178,16 +196,16 @@ var height = this.cameras.main.height; // Corrected typo
             this.isPlayerOnGround = false;
         }
 
-        if (this.frameCounter % 25) {
-            this.player.setTexture('second player');
-        }
-        if (this.frameCounter % 50) {
-            this.player.setTexture('start player');
-        }
+       if (this.frameCounter % 15 === 0) {
+    this.player.setTexture('second player');
+}
+if (this.frameCounter % 30 === 0) {
+    this.player.setTexture('start player');
+}
     
     }
     jump() {
-        this.player.setVelocityY(-400);
+        this.player.setVelocityY(-500);
         this.jumpSound.play();
 } 
 }
@@ -200,8 +218,8 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
-            debug: false
+            gravity: { y: 700 },
+            debug: true
         }
     },
     scale: {

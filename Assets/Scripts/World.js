@@ -84,6 +84,8 @@ var height = this.cameras.main.height; // Corrected typo
 
         // load the tileset image
         this.load.image('tiles', 'Assets/tilemaps/map.png');
+
+
     }
 
     create()
@@ -100,11 +102,14 @@ var height = this.cameras.main.height; // Corrected typo
         // add the tileset image to the map
         const tileset = map.addTilesetImage('spritesheet', 'tiles');
 
+     
+
         // create the layers
        const layer = map.createLayer('Tile Layer 1', tileset, 0, +200);
 
 
-        //this.physics.add.collider(this.player, layer); // THIS BREAKS CODE DO NOT RUN
+
+        //this.physics.add.collider(this.player, layer); // this breaks tilemaps. DO NOT RUN, works fine without it
         layer.setCollisionBetween(0, 100);
 
         // create the score text and set it to follow the camera
@@ -141,11 +146,15 @@ var height = this.cameras.main.height; // Corrected typo
 
             this.score = 0;
 
+            this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+
+            this.frameCounter = 0;
+
         }
 
     update () {
 
-     
+        this.frameCounter++;
 
         // destroy coin, increase score, and update score text
         if (this.physics.overlap(this.player, this.coin)) {
@@ -157,26 +166,32 @@ var height = this.cameras.main.height; // Corrected typo
         // move the player left and right
         if (this.input.keyboard.addKey('A').isDown) {
             this.player.x -= 5;
-            // swap the player image
-            this.player.setTexture('second player');
+
         }
         if (this.input.keyboard.addKey('D').isDown) {
             this.player.x += 5;
-            // swap the player image continuously when moving
-                this.player.setTexture('start player');
+        
         }
         if (this.input.keyboard.addKey('Space').isDown && this.isPlayerOnGround) {
             // jump
             this.jump();
             this.isPlayerOnGround = false;
         }
+
+        if (this.frameCounter % 25) {
+            this.player.setTexture('second player');
+        }
+        if (this.frameCounter % 50) {
+            this.player.setTexture('start player');
+        }
     
     }
     jump() {
         this.player.setVelocityY(-400);
         this.jumpSound.play();
+} 
 }
-}
+
 const config = {
     type: Phaser.AUTO,
     width: window.innerWidth,
@@ -193,8 +208,8 @@ const config = {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
-    scene: [Menu, World],
+    scene: [MainMenu, World],
 };
 
 
-const game = new Phaser.Game(config);
+const game = new Phaser.Game(config); 

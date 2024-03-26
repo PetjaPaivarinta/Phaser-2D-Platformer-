@@ -1,6 +1,6 @@
-class World extends Phaser.Scene {
+class iceWorld extends Phaser.Scene {
   constructor() {
-    super({ key: "GameScene" });
+    super({ key: "iceWorld" });
     this.player = null;
   }
 
@@ -76,41 +76,26 @@ class World extends Phaser.Scene {
     }
 
     // load tilemap
-    this.load.tilemapTiledJSON("map", "Assets/tilemaps/world1.json");
+    this.load.tilemapTiledJSON("map2", "Assets/tilemaps/iceWorldMap.json");
 
     // load the tileset image
-    this.load.image("tiles", "Assets/tilemaps/world1 tiles.png", {
+    this.load.image("tiles2", "Assets/tilemaps/ice Tiles.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
   }
 
   create() {
-    this.add
-      .text(
-        this.sys.game.config.width / 2,
-        this.sys.game.config.height / 1.5 - 150,
-        "Welcome to the Game",
-        {
-          fontFamily: "Comic Sans",
-          fontSize: "220px",
-          color: "#ffffff",
-          fontWeight: "bold",
-        }
-      )
-      .setOrigin(0.5)
-      .setDepth(1)
-      .setScale(0.2);
     this.jumpSound = this.sound.add("jump");
 
     // is grounded
     this.isPlayerOnGround = false;
 
     // load the tilemap stuff
-    const map = this.make.tilemap({ key: "map" });
+    const map = this.make.tilemap({ key: "map2" });
 
     // add the tileset image to the map
-    const tileset = map.addTilesetImage("spritesheet", "tiles");
+    const tileset = map.addTilesetImage("ice", "tiles2");
 
     // create the layers
     const layer = map.createLayer("Ground", tileset, 100, 100);
@@ -158,6 +143,8 @@ class World extends Phaser.Scene {
         layer,
         () => {
           this.isPlayerOnGround = true;
+
+          this.player.setVelocityX(0);
         },
         null,
         this
@@ -229,10 +216,6 @@ class World extends Phaser.Scene {
         this,
         true
       ); // the third parameter is `once`, which means the event listener will be removed after being triggered
-    }
-
-    if (this.score === 100) {
-      this.scene.start("iceWorld");
     }
 
     this.frameCounter++;

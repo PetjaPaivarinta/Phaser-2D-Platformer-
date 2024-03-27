@@ -32,7 +32,7 @@ class MainMenu extends Phaser.Scene {
         // if you click inside the box variable then it will change the scene
         if (this.input.activePointer.leftButtonDown() && this.input.activePointer.x > this.sys.game.config.width / 2 - 150 && this.input.activePointer.x < this.sys.game.config.width / 2 + 150 && this.input.activePointer.y > this.sys.game.config.height / 2 - 50 && this.input.activePointer.y < this.sys.game.config.height / 2 + 50)
         {
-            this.scene.start('iceWorld');
+            this.scene.start('GameScene');
         }
     }
 }

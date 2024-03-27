@@ -1,3 +1,4 @@
+var platforms;
 class iceWorld extends Phaser.Scene {
   constructor() {
     super({ key: "iceWorld" });
@@ -70,6 +71,7 @@ class iceWorld extends Phaser.Scene {
     this.load.image("coin", "Assets/Images/coin.png");
     this.load.audio("jump", "Assets/Audio/jump.mp3");
     this.load.image("lava", "Assets/Images/lava.png");
+    this.load.image("platform", "Assets/Images/platform.png");
 
     for (let i = 0; i < 100; i++) {
       this.load.image("coin" + i, "Assets/Images/coin.png");
@@ -98,10 +100,10 @@ class iceWorld extends Phaser.Scene {
     const tileset = map.addTilesetImage("ice", "tiles2");
 
     // create the layers
-    const layer = map.createLayer("Ground", tileset, 100, 100);
-    const notGroundLayer = map.createLayer("Tile Layer 1", tileset, 100, 100);
+    const layer = map.createLayer("Ground", tileset, 0, 0);
+    const notGroundLayer = map.createLayer("Tile Layer 1", tileset, 0, 0);
 
-    notGroundLayer.setCollisionBetween(0, 100);
+    notGroundLayer.setCollisionBetween(0, 10000);
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
@@ -109,7 +111,7 @@ class iceWorld extends Phaser.Scene {
       this.sys.game.config.width / 3.3,
       this.sys.game.config.height / 3.2,
       "Score: 0",
-      { fontSize: "200px", fill: "#000" }
+      { fontSize: "200px", fill: "#000", fontWeight: "bold" }
     );
     this.scoreText.setScrollFactor(0);
     this.scoreText.setDepth(1);
@@ -125,14 +127,61 @@ class iceWorld extends Phaser.Scene {
     this.lava.setScale(500, 3);
     this.lava.body.setAllowGravity(false);
 
+    // Create the platform
+    // Create the platforms
+    this.platforms = this.physics.add.staticGroup();
+
+    this.platforms.create(4400, 1500, "platform").setScale(0.1).refreshBody();
+    this.platforms.create(4500, 1300, "platform").setScale(0.1).refreshBody();
+    this.platforms.create(4400, 1100, "platform").setScale(0.1).refreshBody();
+    this.platforms.create(4400, 900, "platform").setScale(0.1).refreshBody();
+
+    // Create the tweens
+    this.tweens.add({
+      targets: this.platforms.getChildren()[0],
+      x: 4800,
+      duration: 1000,
+      ease: "Linear",
+      yoyo: true,
+      repeat: -1,
+    });
+
+    this.tweens.add({
+      targets: this.platforms.getChildren()[1],
+      x: 4800,
+      duration: 1100,
+      ease: "Linear",
+      yoyo: true,
+      repeat: -1,
+    });
+
+    this.tweens.add({
+      targets: this.platforms.getChildren()[2],
+      x: 4800,
+      duration: 1400,
+      ease: "Linear",
+      yoyo: true,
+      repeat: -1,
+    });
+    this.tweens.add({
+      targets: this.platforms.getChildren()[3],
+      x: 4800,
+      duration: 900,
+      ease: "Linear",
+      yoyo: true,
+      repeat: -1,
+    });
+
     // create the player
-    this.player = this.physics.add.image(
-      this.sys.game.config.width / 2 - 125,
-      this.sys.game.config.height / 1.5 + 70,
+    this.player = this.physics.add.sprite(
+      this.sys.game.config.width / 2.5,
+      this.sys.game.config.height / 1.6,
       "start player"
     );
     this.player.setScale(0.15);
 
+    this.player.setDrag(100, 0);
+    this.player.setMaxVelocity(1000, 500);
     this.physics.add.collider(this.lava, this.player, () => {
       this.scene.restart();
       this.score = 0;
@@ -143,12 +192,16 @@ class iceWorld extends Phaser.Scene {
         layer,
         () => {
           this.isPlayerOnGround = true;
-
-          this.player.setVelocityX(0);
         },
         null,
         this
       );
+
+    this.physics.add.collider(this.player, notGroundLayer);
+
+    this.physics.add.collider(this.player, this.platforms, () => {
+      this.scene.restart();
+    });
 
     this.cameras.main.setZoom(2);
 
@@ -185,14 +238,22 @@ class iceWorld extends Phaser.Scene {
       Phaser.Input.Keyboard.KeyCodes.ESC
     );
     this.isPaused = false;
+
+    this.isPlayerOnGround = false;
   }
 
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
 
     // Increase and update the score
-    this.score += 10;
-    this.scoreText.setText("Score: " + this.score);
+    this.tweens.add({
+      targets: this,
+      score: this.score + 10,
+      duration: 200,
+      onUpdate: () => {
+        this.scoreText.setText("Score: " + Math.floor(this.score));
+      },
+    });
   }
 
   update() {
@@ -220,7 +281,12 @@ class iceWorld extends Phaser.Scene {
 
     this.frameCounter++;
 
-    // destroy coin, increase score, and update score text
+    // update the collider every 10 frames
+    if (this.frameCounter % 10 === 0) {
+      this.platforms.getChildren().forEach((platform) => {
+        platform.refreshBody();
+      });
+    }
 
     // move the player left and right
     if (this.input.keyboard.addKey("A").isDown) {
@@ -233,6 +299,15 @@ class iceWorld extends Phaser.Scene {
       // jump
       this.jump();
       this.isPlayerOnGround = false;
+    }
+
+    if (this.player.x > 4300) {
+      this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
+      this.cameras.main.zoomTo(1.5);
+      this.lava.destroy();
+    } else {
+      this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
+      this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
     }
 
     if (this.frameCounter % 15 === 0) {

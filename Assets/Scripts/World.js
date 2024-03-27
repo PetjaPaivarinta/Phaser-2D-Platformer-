@@ -124,7 +124,7 @@ class World extends Phaser.Scene {
       this.sys.game.config.width / 3.3,
       this.sys.game.config.height / 3.2,
       "Score: 0",
-      { fontSize: "200px", fill: "#000" }
+      { fontSize: "200px", fill: "#000", fontWeight: "bold" }
     );
     this.scoreText.setScrollFactor(0);
     this.scoreText.setDepth(1);
@@ -203,9 +203,14 @@ class World extends Phaser.Scene {
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
 
-    // Increase and update the score
-    this.score += 10;
-    this.scoreText.setText("Score: " + this.score);
+    this.tweens.add({
+      targets: this,
+      score: this.score + 10,
+      duration: 200,
+      onUpdate: () => {
+        this.scoreText.setText("Score: " + Math.floor(this.score));
+      },
+    });
   }
 
   update() {

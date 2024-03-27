@@ -249,7 +249,7 @@ class iceWorld extends Phaser.Scene {
     this.tweens.add({
       targets: this,
       score: this.score + 10,
-      duration: 200,
+      duration: 100,
       onUpdate: () => {
         this.scoreText.setText("Score: " + Math.floor(this.score));
       },

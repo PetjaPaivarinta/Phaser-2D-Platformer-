@@ -126,6 +126,7 @@ class iceWorld extends Phaser.Scene {
     this.lava.setDepth(5);
     this.lava.setScale(500, 3);
     this.lava.body.setAllowGravity(false);
+    this.lava.setImmovable(true);
 
     // Create the platform
     // Create the platforms
@@ -174,7 +175,7 @@ class iceWorld extends Phaser.Scene {
 
     // create the player
     this.player = this.physics.add.sprite(
-      this.sys.game.config.width / 2.5,
+      this.sys.game.config.width / 2.7,
       this.sys.game.config.height / 1.6,
       "start player"
     );
@@ -249,7 +250,7 @@ class iceWorld extends Phaser.Scene {
     this.tweens.add({
       targets: this,
       score: this.score + 10,
-      duration: 100,
+      duration: 50,
       onUpdate: () => {
         this.scoreText.setText("Score: " + Math.floor(this.score));
       },
@@ -299,6 +300,13 @@ class iceWorld extends Phaser.Scene {
       // jump
       this.jump();
       this.isPlayerOnGround = false;
+    }
+
+    if (
+      this.input.keyboard.addKey("D").isUp &&
+      this.player.body.velocity.y === 0
+    ) {
+      this.player.setVelocityX(100);
     }
 
     if (this.player.x > 4300) {

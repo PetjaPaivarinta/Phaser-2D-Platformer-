@@ -203,8 +203,8 @@ class iceWorld extends Phaser.Scene {
     this.player.setMaxVelocity(300, 500);
     this.physics.add.collider(this.lava2, this.player, () => {
       this.scene.restart();
+      this.scoreText.setText("Score: 0");
       this.score = 0;
-      this.scoreText.setText("Score: " + this.score);
     }),
       this.physics.add.collider(
         this.player,
@@ -237,7 +237,6 @@ class iceWorld extends Phaser.Scene {
       this.physics.add.collider(coin, layer);
       coin.setBounce(0.5);
     }, this);
-    this.score = 0;
 
     this.physics.add.overlap(
       this.player,
@@ -259,12 +258,15 @@ class iceWorld extends Phaser.Scene {
     this.isPaused = false;
 
     this.isPlayerOnGround = false;
+    
+    this.score = 0;
   }
 
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
 
     // Increase and update the score
+    
     this.tweens.add({
       targets: this,
       score: this.score + 10,

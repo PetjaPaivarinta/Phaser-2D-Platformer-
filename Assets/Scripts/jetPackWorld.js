@@ -84,7 +84,7 @@ class jetPackWorld extends Phaser.Scene {
   create() {
     this.background = this.add.tileSprite(
       0,
-      400,
+      200,
       this.sys.game.config.width * 10,
       this.sys.game.config.height * 2,
       "background"
@@ -107,16 +107,15 @@ class jetPackWorld extends Phaser.Scene {
 
     // create the score text and set it to follow the camera
     this.scoreText = this.add.text(
-      this.sys.game.config.width / 3.3,
-      this.sys.game.config.height / 3.2,
+      this.sys.game.config.width / 20,
+      this.sys.game.config.height / 5.2,
       "Score: 0",
       { fontSize: "200px", fill: "#000", fontWeight: "bold" }
     );
     this.scoreText.setScrollFactor(0);
     this.scoreText.setDepth(1);
-    this.scoreText.setScale(0.1);
+    this.scoreText.setScale(0.2);
 
-   
     // Create the platforms
     this.platforms = this.physics.add.staticGroup();
 
@@ -173,29 +172,28 @@ class jetPackWorld extends Phaser.Scene {
     // create the player
     // Assuming 'player' is your player object
     this.player = this.physics.add.sprite(
-      this.sys.game.config.width / 2, // Spawn at half the game's width
+      this.sys.game.config.width / 4, // Spawn at half the game's width
       this.sys.game.config.height / 2, // Spawn at half the game's height
       "start player"
     );
-    this.player.setScale(0.15);
-
+    this.player.setScale(0.25);
+    this.player.setGravityY(500);
+    this.player.body.immovable = true;
     this.player.setDrag(100, 0);
     this.player.setMaxVelocity(300, 500);
-      this.physics.add.collider(
-        this.player,
-        layer,
-        () => {
-          this.isPlayerOnGround = true;
-        },
-        null,
-        this
-      );
+    this.physics.add.collider(
+      this.player,
+      layer,
+      () => {
+        this.isPlayerOnGround = true;
+      },
+      null,
+      this
+    );
 
     this.physics.add.collider(this.player, this.platforms, () => {
       this.scene.restart();
     });
-
-    this.cameras.main.setZoom(2);
 
     this.escapeKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
@@ -209,12 +207,51 @@ class jetPackWorld extends Phaser.Scene {
     this.isPaused = false;
 
     this.isPlayerOnGround = false;
+
+    this.particles = this.add.particles("platform");
+
+    this.emitter = this.particles.createEmitter({
+      speed: 100,
+      scale: { start: 1, end: 0 },
+      blendMode: "ADD",
+    });
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+    this.keys = {
+      W: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+      SPACE: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE),
+      A: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+      D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+    };
   }
 
   update() {
-    if (this.player.body.velocity.y > 200 && this.isPlayerOnGround) {
-      this.isPlayerOnGround = false;
+    // In your update method
+    if (
+      this.cursors.up.isDown ||
+      this.keys.W.isDown ||
+      this.keys.SPACE.isDown ||
+      this.input.activePointer.isDown
+    ) {
+      this.player.setVelocityY(-300); // Adjust the value as needed
+      this.emitter.setPosition(
+        this.player.x,
+        this.player.y + this.player.height / 2
+      );
+      this.emitter.start();
+    } else {
+      // Stop the emitter
+      this.emitter.stop();
     }
+
+    if (this.cursors.left.isDown || this.keys.A.isDown) {
+      this.player.setVelocityX(-200); // Adjust the value as needed
+    } else if (this.cursors.right.isDown || this.keys.D.isDown) {
+      this.player.setVelocityX(200); // Adjust the value as needed
+    } else {
+      this.player.setVelocityX(0);
+    }
+
     if (Phaser.Input.Keyboard.JustDown(this.escapeKey) && !this.isPaused) {
       this.scene.pause();
       this.isPaused = true;
@@ -239,33 +276,6 @@ class jetPackWorld extends Phaser.Scene {
       this.platforms.getChildren().forEach((platform) => {
         platform.refreshBody();
       });
-    }
-    if (this.player.x > 4200 && this.player.y > 1700 && this.isPlayerOnGround) {
-      this.load.scene("jetPackScene");
-    }
-
-    // move the player left and right
-    if (this.input.keyboard.addKey("A").isDown) {
-      this.background.tilePositionX += 1.5;
-
-      this.player.setVelocityX(-300);
-    } else if (this.input.keyboard.addKey("D").isDown) {
-      this.player.setVelocityX(300);
-      this.background.tilePositionX -= 1.5;
-    }
-    if (this.input.keyboard.addKey("Space").isDown && this.isPlayerOnGround) {
-      // jump
-      this.jump();
-      this.isPlayerOnGround = false;
-    }
-
-    if (this.player.x > 4300) {
-      this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
-      this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
-      this.cameras.main.zoomTo(1);
-    } else {
-      this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
-      this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
     }
 
     if (this.frameCounter % 15 === 0) {

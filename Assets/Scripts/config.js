@@ -1,3 +1,4 @@
+window.onload = function () {
 const config = {
   type: Phaser.AUTO,
   width: window.innerWidth,
@@ -10,15 +11,17 @@ const config = {
   physics: {
     default: "arcade",
     arcade: {
-      gravity: { y: 800 },
-      debug: false,
+      gravity: { y: 900 },
+      debug: true,
     },
   },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [MainMenu, World, iceWorld],
+  scene: [MainMenu, World, iceWorld, jetPackWorld],
+}
+const game = new Phaser.Game(config);
+
 };
 
-const game = new Phaser.Game(config);

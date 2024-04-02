@@ -1,7 +1,6 @@
-var platforms;
-class iceWorld extends Phaser.Scene {
+class jetPackWorld extends Phaser.Scene {
   constructor() {
-    super({ key: "iceWorld" });
+    super({ key: "jetPackWorld" });
     this.player = null;
   }
 
@@ -69,20 +68,14 @@ class iceWorld extends Phaser.Scene {
     this.load.image("start player", "Assets/Images/1st Player img.png");
     this.load.image("second player", "Assets/Images/2nd Player img.png");
     this.load.image("background", "Assets/Images/background.png");
-    this.load.image("coin", "Assets/Images/coin.png");
     this.load.audio("jump", "Assets/Audio/jump.mp3");
-    this.load.image("lava2", "Assets/Images/water.jpg");
     this.load.image("platform", "Assets/Images/platform.png");
 
-    for (let i = 0; i < 100; i++) {
-      this.load.image("coin" + i, "Assets/Images/coin.png");
-    }
-
     // load tilemap
-    this.load.tilemapTiledJSON("map2", "Assets/tilemaps/iceWorldMap.json");
+    this.load.tilemapTiledJSON("map3", "Assets/tilemaps/jetpackWorld.json");
 
     // load the tileset image
-    this.load.image("tiles2", "Assets/tilemaps/ice Tiles.png", {
+    this.load.image("tiles3", "Assets/tilemaps/jetWall.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
@@ -102,16 +95,14 @@ class iceWorld extends Phaser.Scene {
     this.isPlayerOnGround = false;
 
     // load the tilemap stuff
-    const map = this.make.tilemap({ key: "map2" });
+    const map = this.make.tilemap({ key: "map3" });
 
     // add the tileset image to the map
-    const tileset = map.addTilesetImage("ice", "tiles2");
+    const tileset = map.addTilesetImage("jetWall", "tiles3");
 
     // create the layers
-    const layer = map.createLayer("Ground", tileset, 0, 0);
-    const notGroundLayer = map.createLayer("Tile Layer 1", tileset, 0, 0);
+    const layer = map.createLayer("Tile Layer 1", tileset, 0, 0);
 
-    notGroundLayer.setCollisionBetween(0, 10000);
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
@@ -125,18 +116,7 @@ class iceWorld extends Phaser.Scene {
     this.scoreText.setDepth(1);
     this.scoreText.setScale(0.1);
 
-    // create the lava2
-    this.lava2 = this.physics.add.image(
-      this.sys.game.config.width / 2,
-      this.sys.game.config.height / 1.5 + 225,
-      "lava2"
-    );
-    this.lava2.setDepth(5);
-    this.lava2.setScale(10, 0.5);
-    this.lava2.body.setAllowGravity(false);
-    this.lava2.setImmovable(true);
-
-    // Create the platform
+   
     // Create the platforms
     this.platforms = this.physics.add.staticGroup();
 
@@ -201,11 +181,6 @@ class iceWorld extends Phaser.Scene {
 
     this.player.setDrag(100, 0);
     this.player.setMaxVelocity(300, 500);
-    this.physics.add.collider(this.lava2, this.player, () => {
-      this.scene.restart();
-      this.score = 0;
-      this.scoreText.setText("Score: " + this.score);
-    }),
       this.physics.add.collider(
         this.player,
         layer,
@@ -216,36 +191,11 @@ class iceWorld extends Phaser.Scene {
         this
       );
 
-    this.physics.add.collider(this.player, notGroundLayer);
-
     this.physics.add.collider(this.player, this.platforms, () => {
       this.scene.restart();
     });
 
     this.cameras.main.setZoom(2);
-
-    this.coins = this.physics.add.group({
-      key: "coin",
-      repeat: 100, // Number of coins to create
-      setXY: { x: 1000, y: 100, stepX: 50 }, // Position of the first coin and the distance between coins
-    });
-
-    // Set properties for each coin
-    this.coins.children.iterate(function (coin) {
-      coin.setScale(0.5); // Adjust scale as needed
-      coin.setGravityY(500);
-      this.physics.add.collider(coin, layer);
-      coin.setBounce(0.5);
-    }, this);
-    this.score = 0;
-
-    this.physics.add.overlap(
-      this.player,
-      this.coins,
-      this.collectCoin,
-      null,
-      this
-    );
 
     this.escapeKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
@@ -259,20 +209,6 @@ class iceWorld extends Phaser.Scene {
     this.isPaused = false;
 
     this.isPlayerOnGround = false;
-  }
-
-  collectCoin(player, coin) {
-    coin.disableBody(true, true); // This will hide and disable the coin
-
-    // Increase and update the score
-    this.tweens.add({
-      targets: this,
-      score: this.score + 10,
-      duration: 50,
-      onUpdate: () => {
-        this.scoreText.setText("Score: " + Math.floor(this.score));
-      },
-    });
   }
 
   update() {
@@ -305,7 +241,7 @@ class iceWorld extends Phaser.Scene {
       });
     }
     if (this.player.x > 4200 && this.player.y > 1700 && this.isPlayerOnGround) {
-      this.scene.start("jetPackWorld");
+      this.load.scene("jetPackScene");
     }
 
     // move the player left and right
@@ -327,7 +263,6 @@ class iceWorld extends Phaser.Scene {
       this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
       this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
       this.cameras.main.zoomTo(1);
-      this.lava2.destroy();
     } else {
       this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
       this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position

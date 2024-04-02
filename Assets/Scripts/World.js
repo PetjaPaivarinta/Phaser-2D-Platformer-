@@ -244,12 +244,12 @@ class World extends Phaser.Scene {
 
     // destroy coin, increase score, and update score text
 
-    // move the player left and right
     if (this.input.keyboard.addKey("A").isDown) {
-      this.player.x -= 5;
-    }
-    if (this.input.keyboard.addKey("D").isDown) {
-      this.player.x += 5;
+      this.player.setVelocityX(-300);
+    } else if (this.input.keyboard.addKey("D").isDown) {
+      this.player.setVelocityX(300);
+    } else {
+      this.player.setVelocityX(0);
     }
     if (this.input.keyboard.addKey("Space").isDown && this.isPlayerOnGround) {
       // jump

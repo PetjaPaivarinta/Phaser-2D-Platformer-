@@ -1,6 +1,6 @@
-class jetPackWorld extends Phaser.Scene {
+class GDWorld extends Phaser.Scene {
   constructor() {
-    super({ key: "jetPackWorld" });
+    super({ key: "GDWorld" });
     this.player = null;
   }
 
@@ -13,7 +13,7 @@ class jetPackWorld extends Phaser.Scene {
 
     progressBox.fillRect(width / 2 - 30, height / 2 - 30, 2, 2);
     var loadingText = this.make.text({
-      x: width / 2,
+      x: width / 2,ö
       y: height / 2 - 50,
       text: "Loading...",
       style: {

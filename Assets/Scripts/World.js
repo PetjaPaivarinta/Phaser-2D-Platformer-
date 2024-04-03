@@ -139,6 +139,7 @@ class World extends Phaser.Scene {
     this.lava.setDepth(5);
     this.lava.setScale(500, 3);
     this.lava.body.setAllowGravity(false);
+    this.lava.setImmovable(true);
 
     // create the player
     this.player = this.physics.add.image(800, 700, "start player");

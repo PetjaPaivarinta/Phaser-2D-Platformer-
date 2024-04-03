@@ -120,14 +120,14 @@ class World extends Phaser.Scene {
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
-    this.scoreText = this.add.text(
-      this.sys.game.config.width / 3.3,
-      this.sys.game.config.height / 3.2,
-      "Score: 0",
-      { fontSize: "200px", fill: "#000", fontWeight: "bold" }
-    );
+    this.scoreText = this.add.text(500, 300, "Score: ", {
+      fontSize: "200px",
+      fill: "#000",
+      fontWeight: "bold",
+    });
     this.scoreText.setScrollFactor(0);
     this.scoreText.setDepth(1);
+    this.scoreText.setText("Score: " + scoreManager.getScore());
     this.scoreText.setScale(0.1);
 
     // create the lava
@@ -141,17 +141,15 @@ class World extends Phaser.Scene {
     this.lava.body.setAllowGravity(false);
 
     // create the player
-    this.player = this.physics.add.image(
-      this.sys.game.config.width / 2 - 125,
-      this.sys.game.config.height / 1.5 + 70,
-      "start player"
-    );
+    this.player = this.physics.add.image(800, 700, "start player");
     this.player.setScale(0.15);
 
     this.physics.add.collider(this.lava, this.player, () => {
-      this.scene.restart();
-      this.score = 0;
-      this.scoreText.setText("Score: " + this.score);
+      scoreManager.score = Math.floor(scoreManager.score / 2);
+      this.scoreText.setText("Score: " + scoreManager.getScore());
+      this.player.y = 700;
+      this.player.x = 800;
+      this.player.setVelocityY(0);
     }),
       this.physics.add.collider(
         this.player,
@@ -178,8 +176,6 @@ class World extends Phaser.Scene {
       this.physics.add.collider(coin, layer);
       coin.setBounce(0.5);
     }, this);
-    this.score = 0;
-
     this.physics.add.overlap(
       this.player,
       this.coins,
@@ -203,14 +199,8 @@ class World extends Phaser.Scene {
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
 
-    this.tweens.add({
-      targets: this,
-      score: this.score + 10,
-      duration: 100,
-      onUpdate: () => {
-        this.scoreText.setText("Score: " + Math.floor(this.score));
-      },
-    });
+    scoreManager.increaseScore(10),
+      this.scoreText.setText("Score: " + scoreManager.getScore());
   }
 
   update() {
@@ -236,7 +226,7 @@ class World extends Phaser.Scene {
       ); // the third parameter is `once`, which means the event listener will be removed after being triggered
     }
 
-    if (this.score === 100) {
+    if (scoreManager.getScore() >= 110) {
       this.scene.start("iceWorld");
     }
 

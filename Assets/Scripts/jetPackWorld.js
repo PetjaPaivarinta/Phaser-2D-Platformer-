@@ -69,6 +69,7 @@ class jetPackWorld extends Phaser.Scene {
     this.load.image("second player", "Assets/Images/2nd Player img.png");
     this.load.image("background", "Assets/Images/background.png");
     this.load.audio("jump", "Assets/Audio/jump.mp3");
+    this.load.image("enemy", "Assets/Images/enemy.png");
     this.load.image("platform", "Assets/Images/platform.png");
 
     // load tilemap
@@ -103,76 +104,26 @@ class jetPackWorld extends Phaser.Scene {
     // create the layers
     const layer = map.createLayer("Tile Layer 1", tileset, 0, 0);
 
+    const notGroundLayer = map.createLayer("Ground", tileset, 0, 0);
+
     layer.setCollisionBetween(0, 100);
+    notGroundLayer.setCollisionBetween(0, 10000);
 
     // create the score text and set it to follow the camera
-    this.scoreText = this.add.text(
-      this.sys.game.config.width / 20,
-      this.sys.game.config.height / 5.2,
-      "Score: 0",
-      { fontSize: "200px", fill: "#000", fontWeight: "bold" }
-    );
+    this.scoreText = this.add.text(200, 100, "", {
+      fontSize: "200px",
+      fill: "#000",
+      fontWeight: "bold",
+    });
     this.scoreText.setScrollFactor(0);
+    this.scoreText.setText("Score: " + scoreManager.getScore());
     this.scoreText.setDepth(1);
     this.scoreText.setScale(0.2);
-
-    // Create the platforms
-    this.platforms = this.physics.add.staticGroup();
-
-    this.platforms.create(4400, 800, "platform").setScale(0.1).refreshBody();
-    this.platforms.create(4500, 1100, "platform").setScale(0.1).refreshBody();
-    this.platforms.create(4400, 1400, "platform").setScale(0.1).refreshBody();
-    this.platforms.create(4400, 1500, "platform").setScale(0.1).refreshBody();
-    this.platforms.create(4400, 1700, "platform").setScale(0.1).refreshBody();
-
-    // Create the tweens
-    this.tweens.add({
-      targets: this.platforms.getChildren()[0],
-      x: 4800,
-      duration: 2000,
-      ease: "Linear",
-      yoyo: true,
-      repeat: -1,
-    });
-
-    this.tweens.add({
-      targets: this.platforms.getChildren()[1],
-      x: 4800,
-      duration: 2300,
-      ease: "Linear",
-      yoyo: true,
-      repeat: -1,
-    });
-
-    this.tweens.add({
-      targets: this.platforms.getChildren()[2],
-      x: 4800,
-      duration: 2600,
-      ease: "Linear",
-      yoyo: true,
-      repeat: -1,
-    });
-    this.tweens.add({
-      targets: this.platforms.getChildren()[3],
-      x: 4900,
-      duration: 3900,
-      ease: "Linear",
-      yoyo: true,
-      repeat: -1,
-    });
-    this.tweens.add({
-      targets: this.platforms.getChildren()[4],
-      x: 5000,
-      duration: 3900,
-      ease: "Linear",
-      yoyo: true,
-      repeat: -1,
-    });
 
     // create the player
     // Assuming 'player' is your player object
     this.player = this.physics.add.sprite(
-      this.sys.game.config.width / 4, // Spawn at half the game's width
+      100,
       this.sys.game.config.height / 2, // Spawn at half the game's height
       "start player"
     );
@@ -190,9 +141,10 @@ class jetPackWorld extends Phaser.Scene {
       null,
       this
     );
-
-    this.physics.add.collider(this.player, this.platforms, () => {
+    this.physics.add.collider(this.player, notGroundLayer, () => {
       this.scene.restart();
+      scoreManager.score = Math.floor(scoreManager.score / 2);
+      this.scoreText.setText("Score: " + scoreManager.getScore());
     });
 
     this.escapeKey = this.input.keyboard.addKey(
@@ -208,13 +160,7 @@ class jetPackWorld extends Phaser.Scene {
 
     this.isPlayerOnGround = false;
 
-    this.particles = this.add.particles("platform");
-
-    this.emitter = this.particles.createEmitter({
-      speed: 100,
-      scale: { start: 1, end: 0 },
-      blendMode: "ADD",
-    });
+    this.cameras.main.startFollow(this.player);
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.keys = {
@@ -223,10 +169,34 @@ class jetPackWorld extends Phaser.Scene {
       A: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
       D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
+
+    this.time.addEvent({
+      delay: 500,
+      callback: this.spawnEnemies,
+      callbackScope: this,
+      loop: true,
+    });
+
+    this.enemies = this.physics.add.group();
+
+    this.physics.add.collider(this.player, this.enemies, () => {
+      this.scene.restart();
+      scoreManager.score = Math.floor(scoreManager.score / 2);
+      this.scoreText.setText("Score: " + scoreManager.getScore());
+    });
+  }
+
+  spawnEnemies() {
+    let enemy = this.enemies.create(1200, 800, "enemy");
+    enemy.setScale(2.5); // Adjust scale as needed
+    enemy.setVelocityX(-500); // Adjust velocity as needed
+    enemy.body.setAllowGravity(false);
+    enemy.y = Phaser.Math.Between(300, 800); // Set the y-coordinate to a random value between minHeight and maxHeight
+    enemy.setDepth(2);
+    enemy.x = Phaser.Math.Between(2200, 6100);
   }
 
   update() {
-    // In your update method
     if (
       this.cursors.up.isDown ||
       this.keys.W.isDown ||
@@ -234,20 +204,10 @@ class jetPackWorld extends Phaser.Scene {
       this.input.activePointer.isDown
     ) {
       this.player.setVelocityY(-300); // Adjust the value as needed
-      this.emitter.setPosition(
-        this.player.x,
-        this.player.y + this.player.height / 2
-      );
-      this.emitter.start();
-    } else {
-      // Stop the emitter
-      this.emitter.stop();
     }
 
-    if (this.cursors.left.isDown || this.keys.A.isDown) {
-      this.player.setVelocityX(-200); // Adjust the value as needed
-    } else if (this.cursors.right.isDown || this.keys.D.isDown) {
-      this.player.setVelocityX(200); // Adjust the value as needed
+    if (this.cursors.right.isDown || this.keys.D.isDown) {
+      this.player.setVelocityX(500000000); // Adjust the value as needed
     } else {
       this.player.setVelocityX(0);
     }
@@ -270,13 +230,6 @@ class jetPackWorld extends Phaser.Scene {
     }
 
     this.frameCounter++;
-
-    // update the collider every 10 frames
-    if (this.frameCounter % 10 === 0) {
-      this.platforms.getChildren().forEach((platform) => {
-        platform.refreshBody();
-      });
-    }
 
     if (this.frameCounter % 15 === 0) {
       this.player.setTexture("second player");

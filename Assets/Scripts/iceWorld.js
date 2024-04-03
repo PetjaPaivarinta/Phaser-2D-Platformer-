@@ -115,13 +115,13 @@ class iceWorld extends Phaser.Scene {
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
-    this.scoreText = this.add.text(
-      this.sys.game.config.width / 3.3,
-      this.sys.game.config.height / 3.2,
-      "Score: 0",
-      { fontSize: "200px", fill: "#000", fontWeight: "bold" }
-    );
+    this.scoreText = this.add.text(500, 300, "", {
+      fontSize: "200px",
+      fill: "#000",
+      fontWeight: "bold",
+    });
     this.scoreText.setScrollFactor(0);
+    this.scoreText.setText("Score: " + scoreManager.getScore());
     this.scoreText.setDepth(1);
     this.scoreText.setScale(0.1);
 
@@ -192,19 +192,17 @@ class iceWorld extends Phaser.Scene {
 
     // create the player
     // Assuming 'player' is your player object
-    this.player = this.physics.add.sprite(
-      this.sys.game.config.width / 2, // Spawn at half the game's width
-      this.sys.game.config.height / 2, // Spawn at half the game's height
-      "start player"
-    );
+    this.player = this.physics.add.sprite(950, 600, "start player");
     this.player.setScale(0.15);
 
     this.player.setDrag(100, 0);
     this.player.setMaxVelocity(300, 500);
     this.physics.add.collider(this.lava2, this.player, () => {
-      this.scene.restart();
-      this.scoreText.setText("Score: 0");
-      this.score = 0;
+      this.player.y = 600;
+      this.player.x = 950;
+      this.player.setVelocityY(0);
+      this.scoreText.setText("Score: " + scoreManager.getScore());
+      scoreManager.score = Math.floor(scoreManager.score / 2);
     }),
       this.physics.add.collider(
         this.player,
@@ -219,7 +217,11 @@ class iceWorld extends Phaser.Scene {
     this.physics.add.collider(this.player, notGroundLayer);
 
     this.physics.add.collider(this.player, this.platforms, () => {
-      this.scene.restart();
+      this.player.y = 600;
+      this.player.x = 950;
+      this.player.setVelocityY(0);
+      this.scoreText.setText("Score: " + scoreManager.getScore());
+      scoreManager.score = Math.floor(scoreManager.score / 2);
     });
 
     this.cameras.main.setZoom(2);
@@ -258,23 +260,13 @@ class iceWorld extends Phaser.Scene {
     this.isPaused = false;
 
     this.isPlayerOnGround = false;
-    
-    this.score = 0;
   }
 
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
 
-    // Increase and update the score
-    
-    this.tweens.add({
-      targets: this,
-      score: this.score + 10,
-      duration: 50,
-      onUpdate: () => {
-        this.scoreText.setText("Score: " + Math.floor(this.score));
-      },
-    });
+    scoreManager.increaseScore(10),
+      this.scoreText.setText("Score: " + scoreManager.getScore());
   }
 
   update() {

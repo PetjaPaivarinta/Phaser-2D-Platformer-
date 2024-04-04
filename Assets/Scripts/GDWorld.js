@@ -110,7 +110,7 @@ class GDWorld extends Phaser.Scene {
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
-    this.scoreText = this.add.text(200, 300, "", {
+    this.scoreText = this.add.text(650, 350, "TESTINGSIFJ ISNDFHSIUFHGBU", {
       fontSize: "200px",
       fill: "#000",
       fontWeight: "bold",
@@ -118,12 +118,12 @@ class GDWorld extends Phaser.Scene {
     this.scoreText.setScrollFactor(0);
     this.scoreText.setText("Score: " + scoreManager.getScore());
     this.scoreText.setDepth(1);
-    this.scoreText.setScale(0.2);
+    this.scoreText.setScale(0.1);
 
     // create the player
     // Assuming 'player' is your player object
     this.player = this.physics.add.sprite(
-      2,
+      0,
       350, // Spawn at half the game's height
       "start player"
     );
@@ -142,10 +142,19 @@ class GDWorld extends Phaser.Scene {
     this.cameras.main.setZoom(3);
 
     this.physics.add.collider(this.player, notGroundLayer, () => {
-      this.scene.restart();
+      this.groundCounter = 0;
+      this.player.x = 0;
+      this.player.y = 350;
+      this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
+      this.player.body.angle = 0;
+      this.physics.world.gravity.y = 1600;
+
+      this.player.setVelocityX(100);
       scoreManager.score = Math.floor(scoreManager.score / 2);
       this.scoreText.setText("Score: " + scoreManager.getScore());
     });
+
+    console.log(this.groundCounter);
 
     this.escapeKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
@@ -163,15 +172,15 @@ class GDWorld extends Phaser.Scene {
     this.coins = this.physics.add.group({
       key: "coin",
       repeat: 100, // Number of coins to create
-      setXY: { x: 1000, y: 500, stepX: 650 }, // Position of the first coin and the distance between coins
+      setXY: { x: 400, y: 350, stepX: 300 }, // Position of the first coin and the distance between coins
     });
 
     // Set properties for each coin
     this.coins.children.iterate(function (coin) {
-      coin.setScale(1.5); // Adjust scale as needed
-      coin.setGravityY(200);
+      coin.setScale(0.5); // Adjust scale as needed
+      coin.setGravityY(100);
       this.physics.add.collider(coin, layer);
-      coin.setBounce(1);
+      coin.setBounce(0.5);
     }, this);
 
     this.physics.add.overlap(
@@ -190,36 +199,11 @@ class GDWorld extends Phaser.Scene {
       D: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
 
-    this.time.addEvent({
-      delay: 1000,
-      callback: this.spawnEnemies,
-      callbackScope: this,
-      loop: true,
-    });
-
     this.groundCounter = 0;
-
-    this.enemies = this.physics.add.group();
-
-    this.physics.add.collider(this.player, this.enemies, () => {
-      this.scene.restart();
-      scoreManager.score = Math.floor(scoreManager.score / 2);
-      this.scoreText.setText("Score: " + scoreManager.getScore());
-    });
 
     this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
 
     this.player.setVelocityX(100); // Adjust the value as needed
-  }
-
-  spawnEnemies() {
-    let enemy = this.enemies.create(900, 800, "enemy");
-    enemy.setScale(2.5); // Adjust scale as needed
-    enemy.setVelocityX(-500); // Adjust velocity as needed
-    enemy.body.setAllowGravity(false);
-    enemy.y = Phaser.Math.Between(600, 850); // Set the y-coordinate to a random value between minHeight and maxHeight
-    enemy.setDepth(2);
-    enemy.x = Phaser.Math.Between(2200, 6100);
   }
 
   collectCoin(player, coin) {
@@ -236,6 +220,10 @@ class GDWorld extends Phaser.Scene {
       this.time.delayedCall(301, () => {
         this.isJumping = false;
       });
+    }
+
+    if (this.player.x > 6500) {
+      this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
     }
 
     this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
@@ -273,17 +261,13 @@ class GDWorld extends Phaser.Scene {
     if (this.frameCounter % 30 === 0) {
       this.player.setTexture("start player");
     }
-
-    if (this.player.x > 6100) {
-      this.scene.start("GDWorld");
-    }
   }
   jump() {
     if (this.groundCounter == 0) {
       this.physics.world.gravity.y = -1600;
       this.tweens.add({
         targets: this.player,
-        angle: this.player.angle - 180,
+        angle: this.player.angle + 180,
         duration: 300,
       });
       this.groundCounter++;

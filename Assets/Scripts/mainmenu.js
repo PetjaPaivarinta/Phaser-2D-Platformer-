@@ -70,7 +70,7 @@ class MainMenu extends Phaser.Scene {
           500
         )
       ) {
-        this.scene.start("jetPackWorld");
+        this.scene.start("GameScene");
       }
     } else {
       this.box.setFillStyle("595959");
@@ -83,7 +83,7 @@ class MainMenu extends Phaser.Scene {
       this.input.activePointer.y > this.sys.game.config.height / 2 - 50 &&
       this.input.activePointer.y < this.sys.game.config.height / 2 + 50
     ) {
-      this.scene.start("GameScene");
+      this.scene.start("GDWorld");
     }
   }
 }

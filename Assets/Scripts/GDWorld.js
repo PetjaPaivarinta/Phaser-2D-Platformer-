@@ -13,7 +13,7 @@ class GDWorld extends Phaser.Scene {
 
     progressBox.fillRect(width / 2 - 30, height / 2 - 30, 2, 2);
     var loadingText = this.make.text({
-      x: width / 2,ö
+      x: width / 2,
       y: height / 2 - 50,
       text: "Loading...",
       style: {
@@ -74,10 +74,10 @@ class GDWorld extends Phaser.Scene {
     this.load.image("platform", "Assets/Images/platform.png");
 
     // load tilemap
-    this.load.tilemapTiledJSON("map3", "Assets/tilemaps/jetpackWorld.json");
+    this.load.tilemapTiledJSON("map4", "Assets/tilemaps/GDWorldMap.json");
 
     // load the tileset image
-    this.load.image("tiles3", "Assets/tilemaps/jetWall.png", {
+    this.load.image("tiles4", "Assets/tilemaps/GDTiles.png", {
       frameWidth: 32,
       frameHeight: 32,
     });
@@ -97,14 +97,16 @@ class GDWorld extends Phaser.Scene {
     this.isPlayerOnGround = false;
 
     // load the tilemap stuff
-    const map = this.make.tilemap({ key: "map3" });
+    const map = this.make.tilemap({ key: "map4" });
 
     // add the tileset image to the map
-    const tileset = map.addTilesetImage("jetWall", "tiles3");
+    const tileset = map.addTilesetImage("GDTiles", "tiles4");
 
     // create the layers
-    const layer = map.createLayer("Tile Layer 1", tileset, 0, 0);
+    const notGroundLayer = map.createLayer("Ground", tileset, -350, 0);
+    const layer = map.createLayer("Tile Layer 1", tileset, -350, 0);
 
+    notGroundLayer.setCollisionBetween(0, 10000);
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
@@ -121,15 +123,12 @@ class GDWorld extends Phaser.Scene {
     // create the player
     // Assuming 'player' is your player object
     this.player = this.physics.add.sprite(
-      100,
-      800, // Spawn at half the game's height
+      2,
+      350, // Spawn at half the game's height
       "start player"
     );
-    this.player.setScale(0.25);
-    this.player.setGravityY(500);
-    this.player.body.immovable = true;
-    this.player.setDrag(100, 0);
-    this.player.setMaxVelocity(20000, 500);
+    this.player.setScale(0.1);
+    this.player.setMaxVelocity(2000, 500);
     this.physics.add.collider(
       this.player,
       layer,
@@ -139,6 +138,14 @@ class GDWorld extends Phaser.Scene {
       null,
       this
     );
+
+    this.cameras.main.setZoom(3);
+
+    this.physics.add.collider(this.player, notGroundLayer, () => {
+      this.scene.restart();
+      scoreManager.score = Math.floor(scoreManager.score / 2);
+      this.scoreText.setText("Score: " + scoreManager.getScore());
+    });
 
     this.escapeKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC
@@ -190,6 +197,8 @@ class GDWorld extends Phaser.Scene {
       loop: true,
     });
 
+    this.groundCounter = 0;
+
     this.enemies = this.physics.add.group();
 
     this.physics.add.collider(this.player, this.enemies, () => {
@@ -197,6 +206,10 @@ class GDWorld extends Phaser.Scene {
       scoreManager.score = Math.floor(scoreManager.score / 2);
       this.scoreText.setText("Score: " + scoreManager.getScore());
     });
+
+    this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
+
+    this.player.setVelocityX(100); // Adjust the value as needed
   }
 
   spawnEnemies() {
@@ -217,19 +230,15 @@ class GDWorld extends Phaser.Scene {
   }
 
   update() {
-    if (
-      this.cursors.up.isDown ||
-      this.keys.W.isDown ||
-      this.keys.SPACE.isDown ||
-      this.input.activePointer.isDown
-    ) {
-      this.player.setVelocityY(-600); // Adjust the value as needed
+    if (this.keys.SPACE.isDown && this.isPlayerOnGround && !this.isJumping) {
+      this.jump();
+      this.isJumping = true;
+      this.time.delayedCall(301, () => {
+        this.isJumping = false;
+      });
     }
 
     this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
-    this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
-
-    this.player.setVelocityX(500); // Adjust the value as needed
 
     if (Phaser.Input.Keyboard.JustDown(this.escapeKey) && !this.isPaused) {
       this.scene.pause();
@@ -250,6 +259,14 @@ class GDWorld extends Phaser.Scene {
 
     this.frameCounter++;
 
+    if (this.frameCounter % 20 === 0) {
+      this.player.setVelocityX(this.player.body.velocity.x + 5);
+    }
+
+    if (this.player.body.velocity.x > 200) {
+      this.cameras.main.shake(10, 0.01);
+    }
+
     if (this.frameCounter % 15 === 0) {
       this.player.setTexture("second player");
     }
@@ -262,7 +279,27 @@ class GDWorld extends Phaser.Scene {
     }
   }
   jump() {
-    this.player.setVelocityY(-500);
+    if (this.groundCounter == 0) {
+      this.physics.world.gravity.y = -1600;
+      this.tweens.add({
+        targets: this.player,
+        angle: this.player.angle - 180,
+        duration: 300,
+      });
+      this.groundCounter++;
+    } else if (this.groundCounter == 1) {
+      this.physics.world.gravity.y = 1600;
+      this.tweens.add({
+        targets: this.player,
+        angle: this.player.angle + 180,
+        duration: 300,
+      });
+      this.groundCounter--;
+    }
+
+    // rotate the player
+    console.log("jump");
+    this.isPlayerOnGround = false;
     this.jumpSound.play();
   }
 }

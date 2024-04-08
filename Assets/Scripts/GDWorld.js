@@ -144,12 +144,11 @@ class GDWorld extends Phaser.Scene {
     this.physics.add.collider(this.player, notGroundLayer, () => {
       this.groundCounter = 0;
       this.player.x = 0;
+      this.player.setVelocityX(100);
       this.player.y = 350;
       this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
       this.player.body.angle = 0;
       this.physics.world.gravity.y = 1600;
-
-      this.player.setVelocityX(100);
       scoreManager.score = Math.floor(scoreManager.score / 2);
       this.scoreText.setText("Score: " + scoreManager.getScore());
     });
@@ -180,7 +179,7 @@ class GDWorld extends Phaser.Scene {
       coin.setScale(0.5); // Adjust scale as needed
       coin.setGravityY(100);
       this.physics.add.collider(coin, layer);
-      coin.setBounce(0.5);
+      coin.setBounce(1);
     }, this);
 
     this.physics.add.overlap(
@@ -251,9 +250,9 @@ class GDWorld extends Phaser.Scene {
       this.player.setVelocityX(this.player.body.velocity.x + 5);
     }
 
-    if (this.player.body.velocity.x > 200) {
-      this.cameras.main.shake(10, 0.01);
-    }
+    // if (this.player.body.velocity.x > 200) {
+    //   this.cameras.main.shake(40, 0.01);
+    // }
 
     if (this.frameCounter % 15 === 0) {
       this.player.setTexture("second player");
@@ -264,7 +263,7 @@ class GDWorld extends Phaser.Scene {
   }
   jump() {
     if (this.groundCounter == 0) {
-      this.physics.world.gravity.y = -1600;
+      this.physics.world.gravity.y = -2300;
       this.tweens.add({
         targets: this.player,
         angle: this.player.angle + 180,
@@ -272,7 +271,7 @@ class GDWorld extends Phaser.Scene {
       });
       this.groundCounter++;
     } else if (this.groundCounter == 1) {
-      this.physics.world.gravity.y = 1600;
+      this.physics.world.gravity.y = 2300;
       this.tweens.add({
         targets: this.player,
         angle: this.player.angle + 180,

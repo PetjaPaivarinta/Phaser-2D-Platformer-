@@ -70,7 +70,7 @@ class MainMenu extends Phaser.Scene {
           500
         )
       ) {
-        this.scene.start("GameScene");
+        this.scene.start("iceWorld");
       }
     } else {
       this.box.setFillStyle("595959");

@@ -200,6 +200,8 @@ class iceWorld extends Phaser.Scene {
     this.physics.add.collider(this.lava2, this.player, () => {
       this.player.y = 600;
       this.player.x = 950;
+      this.cameras.main.setZoom(2);
+
       this.player.setVelocityY(0);
       this.scoreText.setText("Score: " + scoreManager.getScore());
       scoreManager.score = Math.floor(scoreManager.score / 2);
@@ -214,15 +216,15 @@ class iceWorld extends Phaser.Scene {
         this
       );
 
-    this.physics.add.collider(this.player, notGroundLayer);
-
-    this.physics.add.collider(this.player, this.platforms, () => {
+    this.physics.add.collider(this.player, notGroundLayer, () => {
       this.player.y = 600;
       this.player.x = 950;
       this.player.setVelocityY(0);
       this.scoreText.setText("Score: " + scoreManager.getScore());
       scoreManager.score = Math.floor(scoreManager.score / 2);
     });
+
+    this.physics.add.collider(this.player, this.platforms, () => {});
 
     this.cameras.main.setZoom(2);
 
@@ -321,8 +323,8 @@ class iceWorld extends Phaser.Scene {
       this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
       this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
       this.cameras.main.zoomTo(1);
-      this.lava2.destroy();
     } else {
+      this.cameras.main.setZoom(2)
       this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
       this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
     }

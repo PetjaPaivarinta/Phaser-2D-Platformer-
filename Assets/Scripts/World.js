@@ -227,7 +227,7 @@ class World extends Phaser.Scene {
       ); // the third parameter is `once`, which means the event listener will be removed after being triggered
     }
 
-    if (scoreManager.getScore() >= 110) {
+    if (this.player.x > 5500) {
       this.scene.start("iceWorld");
     }
 
@@ -254,6 +254,7 @@ class World extends Phaser.Scene {
     if (this.frameCounter % 30 === 0) {
       this.player.setTexture("start player");
     }
+    
   }
   jump() {
     this.player.setVelocityY(-500);

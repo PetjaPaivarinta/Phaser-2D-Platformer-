@@ -23,7 +23,18 @@ class iceWorld extends Phaser.Scene {
       },
     });
 
-    loadingText.setOrigin(0.5, 0.5);
+   var mapText = this.make.text({
+     x: width / 2,
+     y: height / 2 - 150,
+     text: "Level 2",
+     style: {
+       font: "50px Impact",
+       fill: "#ddddd",
+     },
+   });
+
+   loadingText.setOrigin(0.5, 0.5);
+   mapText.setOrigin(0.5, 0.5);
 
     var percentText = this.make.text({
       x: width / 2,
@@ -217,11 +228,7 @@ class iceWorld extends Phaser.Scene {
       );
 
     this.physics.add.collider(this.player, notGroundLayer, () => {
-      this.player.y = 600;
-      this.player.x = 950;
-      this.player.setVelocityY(0);
-      this.scoreText.setText("Score: " + scoreManager.getScore());
-      scoreManager.score = Math.floor(scoreManager.score / 2);
+     this.scene.start("DeathMenu");
     });
 
     this.physics.add.collider(this.player, this.platforms, () => {});

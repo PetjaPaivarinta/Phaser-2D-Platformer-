@@ -22,7 +22,18 @@ class World extends Phaser.Scene {
       },
     });
 
+    var mapText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 150,
+      text: "Level 1",
+      style: {
+        font: "50px Impact",
+        fill: "#ddddd",
+      },
+    });
+
     loadingText.setOrigin(0.5, 0.5);
+    mapText.setOrigin(0.5, 0.5);
 
     var percentText = this.make.text({
       x: width / 2,
@@ -146,11 +157,7 @@ class World extends Phaser.Scene {
     this.player.setScale(0.15);
 
     this.physics.add.collider(this.lava, this.player, () => {
-      scoreManager.score = Math.floor(scoreManager.score / 2);
-      this.scoreText.setText("Score: " + scoreManager.getScore());
-      this.player.y = 700;
-      this.player.x = 800;
-      this.player.setVelocityY(0);
+      this.scene.start("DeathMenu");
     }),
       this.physics.add.collider(
         this.player,

@@ -19,7 +19,7 @@ window.onload = function () {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [MainMenu, World, iceWorld, jetPackWorld, GDWorld],
+    scene: [MainMenu, World, iceWorld, jetPackWorld, GDWorld, DeathMenu],
   };
   const game = new Phaser.Game(config);
 };

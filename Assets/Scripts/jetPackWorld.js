@@ -22,7 +22,19 @@ class jetPackWorld extends Phaser.Scene {
       },
     });
 
+    var mapText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 150,
+      text: "Level 3",
+      style: {
+        font: "50px Impact",
+        fill: "#ddddd",
+      },
+    });
+
     loadingText.setOrigin(0.5, 0.5);
+    mapText.setOrigin(0.5, 0.5);
+
 
     var percentText = this.make.text({
       x: width / 2,
@@ -193,9 +205,7 @@ class jetPackWorld extends Phaser.Scene {
     this.enemies = this.physics.add.group();
 
     this.physics.add.collider(this.player, this.enemies, () => {
-      this.scene.restart();
-      scoreManager.score = Math.floor(scoreManager.score / 2);
-      this.scoreText.setText("Score: " + scoreManager.getScore());
+     this.scene.start("DeathMenu");
     });
   }
 

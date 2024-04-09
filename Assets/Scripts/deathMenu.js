@@ -1,4 +1,7 @@
-class MainMenu extends Phaser.Scene {
+class DeathMenu extends Phaser.Scene {
+  constructor() {
+    super({ key: "DeathMenu" });
+  }
   preload() {}
 
   create() {
@@ -7,11 +10,11 @@ class MainMenu extends Phaser.Scene {
       .text(
         this.sys.game.config.width / 2,
         this.sys.game.config.height / 2 - 300,
-        "Main Menu",
+        "Game Over",
         {
           fontFamily: "Impact",
           fontSize: "120px",
-          color: "#ffffff",
+          color: "#8B0000",
           fontWeight: "bold",
         }
       )
@@ -43,16 +46,35 @@ class MainMenu extends Phaser.Scene {
       .text(
         this.sys.game.config.width / 2,
         this.sys.game.config.height / 2,
-        "Start",
+        "Restart",
         {
           fontFamily: "Impact",
-          fontSize: "100px",
+          fontSize: "80px",
           color: "#ffffff",
           fontWeight: "bold",
         }
       )
       .setOrigin(0.5)
-      .setDepth(1);
+      .setDepth(2);
+
+    this.scoreText = this.add
+      .text(
+        this.sys.game.config.width / 2,
+        this.sys.game.config.height / 2 + 200,
+        "",
+        {
+          fontFamily: "Impact",
+          fontSize: "80px",
+          color: "#8B0000",
+          fontWeight: "bold",
+        }
+      )
+      .setOrigin(0.5)
+      .setDepth(2);
+    this.scoreText.setText("Total Score: " + scoreManager.getScore());
+    if (scoreManager.score == 0) {
+      this.scoreText.setText("You ass kid");
+    }
   }
 
   update() {
@@ -71,6 +93,7 @@ class MainMenu extends Phaser.Scene {
         )
       ) {
         this.scene.start("GameScene");
+        scoreManager.score = 0;
       }
     } else {
       this.box.setFillStyle("595959");
@@ -83,7 +106,8 @@ class MainMenu extends Phaser.Scene {
       this.input.activePointer.y > this.sys.game.config.height / 2 - 50 &&
       this.input.activePointer.y < this.sys.game.config.height / 2 + 50
     ) {
-      this.scene.start("GDWorld");
+      this.scene.start("GameScene");
+      scoreManager.score = 0;
     }
   }
 }

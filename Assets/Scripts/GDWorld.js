@@ -21,8 +21,18 @@ class GDWorld extends Phaser.Scene {
         fill: "#ddddd",
       },
     });
+    var mapText = this.make.text({
+      x: width / 2,
+      y: height / 2 - 150,
+      text: "Level 4",
+      style: {
+        font: "50px Impact",
+        fill: "#ddddd",
+      },
+    });
 
     loadingText.setOrigin(0.5, 0.5);
+    mapText.setOrigin(0.5, 0.5);
 
     var percentText = this.make.text({
       x: width / 2,
@@ -142,15 +152,8 @@ class GDWorld extends Phaser.Scene {
     this.cameras.main.setZoom(3);
 
     this.physics.add.collider(this.player, notGroundLayer, () => {
-      this.groundCounter = 0;
-      this.player.x = 0;
-      this.player.setVelocityX(100);
-      this.player.y = 350;
-      this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
-      this.player.body.angle = 0;
-      this.physics.world.gravity.y = 1600;
-      scoreManager.score = Math.floor(scoreManager.score / 2);
-      this.scoreText.setText("Score: " + scoreManager.getScore());
+            this.scene.start("DeathMenu");
+
     });
 
     console.log(this.groundCounter);

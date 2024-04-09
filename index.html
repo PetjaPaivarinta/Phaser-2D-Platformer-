@@ -11,8 +11,14 @@
     <link rel="stylesheet" href="Assets/Css/main.css" />
   </head>
   <body>
+    <script>
+      var IS_TOUCH = false;
+      window.addEventListener("touchstart", function () {
+        IS_TOUCH = true;
+      });
+    </script>
 
-    <audio id="music" src="Assets/Audio/jump.mp3"loop autoplay></audio>
+    <audio id="music" src="Assets/Audio/jump.mp3" loop autoplay></audio>
     <!--[if lt IE 7]>
       <p class="browsehappy">
         You are using an <strong>outdated</strong> browser. Please
@@ -21,7 +27,7 @@
     <![endif]-->
     <script src="Assets/Scripts/mainmenu.js"></script>
     <script src="Assets/Scripts/World.js"></script>
-    <script src="Assets/Scripts/iceWorld.js"></script>    
+    <script src="Assets/Scripts/iceWorld.js"></script>
     <script src="Assets/Scripts/scoreManager.js"></script>
     <script src="Assets/Scripts/jetPackWorld.js"></script>
     <script src="Assets/Scripts/music.js"></script>

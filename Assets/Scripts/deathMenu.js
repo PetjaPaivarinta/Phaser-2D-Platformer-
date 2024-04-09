@@ -6,6 +6,10 @@ class DeathMenu extends Phaser.Scene {
 
   create() {
     // add title text
+
+    if (IS_TOUCH) {
+      this.cameras.main.setZoom(0.6);
+    }
     this.add
       .text(
         this.sys.game.config.width / 2,
@@ -23,14 +27,15 @@ class DeathMenu extends Phaser.Scene {
     // make a black box bigger than the screen
     this.add
       .rectangle(
-        this.sys.game.config.width / 2,
-        this.sys.game.config.height / 2,
+        window.innerWidth / 2,
+        window.innerHeight / 2,
         this.sys.game.config.width,
         this.sys.game.config.height,
         0
       )
       .setOrigin(0.5)
-      .setDepth(0);
+      .setDepth(0)
+    .setScale(100, 20)
     // add box around text
     this.box = this.add
       .rectangle(

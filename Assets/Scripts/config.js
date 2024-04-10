@@ -15,11 +15,13 @@ window.onload = function () {
         debug: false,
       },
     },
+    input: {
+      activePointers: 5,
+    },
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    activePointers: 3,
     scene: [MainMenu, World, iceWorld, jetPackWorld, GDWorld, DeathMenu],
   };
   const game = new Phaser.Game(config);

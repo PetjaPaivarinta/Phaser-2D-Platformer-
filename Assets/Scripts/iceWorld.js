@@ -256,14 +256,14 @@ class iceWorld extends Phaser.Scene {
       this.rightBtn
         .on(
           "pointerdown",
-          function () {
+          function (pointer) {
            this.isRightButtonDown = true;
           },
           this
         )
         .on(
           "pointerup",
-          function () {
+          function (pointer) {
             this.isRightButtonDown = false;
           },
           this
@@ -276,14 +276,14 @@ class iceWorld extends Phaser.Scene {
       this.leftBtn
         .on(
           "pointerdown",
-          function () {
+          function (pointer) {
             this.isLeftButtonDown = true;
           },
           this
         )
         .on(
           "pointerup",
-          function () {
+          function (pointer) {
             this.isLeftButtonDown = false;
           },
           this
@@ -297,10 +297,10 @@ class iceWorld extends Phaser.Scene {
       .setScrollFactor(0)
         .setDepth(5);
       this.jumpBtn
-  .on('pointerdown', function () {
+  .on('pointerdown', function (pointer) {
     this.isJumpButtonDown = true;
   }, this)
-  .on('pointerup', function () {
+  .on('pointerup', function (pointer) {
     this.isJumpButtonDown = false;
   }, this);
     }
@@ -334,6 +334,8 @@ class iceWorld extends Phaser.Scene {
       null,
       this
     );
+
+    this.input.addPointer(7);
 
     this.escapeKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC

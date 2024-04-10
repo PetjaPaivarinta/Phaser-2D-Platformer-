@@ -268,6 +268,11 @@ class iceWorld extends Phaser.Scene {
       this.isJumpButtonDown = false;
     }
   }, this);
+      this.leftBtn = this.add
+        .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDepth(5);
       this.leftBtn
   .on('pointerdown', function (pointer) {
     if (pointer.pointerId === 1) {
@@ -291,7 +296,7 @@ class iceWorld extends Phaser.Scene {
       .setInteractive()
       .setScrollFactor(0)
         .setDepth(5);
-     this.jumpBtn
+      this.jumpBtn
   .on('pointerdown', function (pointer) {
     this.isJumpButtonDown = true;
   }, this)

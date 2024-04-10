@@ -242,7 +242,14 @@ class World extends Phaser.Scene {
       )
       .setInteractive({capture: false})
       .setScrollFactor(0)
-      .setDepth(5);
+        .setDepth(5);
+      this.jumpBtn
+  .on('pointerdown', function () {
+    this.isJumpButtonDown = true;
+  }, this)
+  .on('pointerup', function () {
+    this.isJumpButtonDown = false;
+  }, this);
     }
     this.coins = this.physics.add.group({
       key: "coin",
@@ -291,7 +298,11 @@ class World extends Phaser.Scene {
         this.moveLeft();
       } else if (this.isRightButtonDown) {
         this.moveRight();
-      } else if (!this.isLeftButtonDown && !this.isRightButtonDown) {
+      } else if (this.isJumpButtonDown && this.isPlayerOnGround) {
+        this.jump();
+        this.isPlayerOnGround = false;
+      } else if
+        (!this.isLeftButtonDown && !this.isRightButtonDown) {
         this.stopMoving();
       }
     }
@@ -302,15 +313,6 @@ class World extends Phaser.Scene {
 
     if (IS_TOUCH) {
       this.cameras.main.scrollY = 500;
-      if (
-        this.input.activePointer.leftButtonDown() &&
-        this.isPlayerOnGround &&
-        this.input.activePointer.x > this.sys.game.config.width / 1.5 &&
-        this.input.activePointer.y > this.sys.game.config.height / 3
-      ) {
-        this.jump();
-        this.isPlayerOnGround = false;
-      }
     } else {
       this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
     }

@@ -336,6 +336,7 @@ class iceWorld extends Phaser.Scene {
     );
 
     this.input.addPointer(7);
+    InputPlugin.addPointer();
 
     this.escapeKey = this.input.keyboard.addKey(
       Phaser.Input.Keyboard.KeyCodes.ESC

@@ -84,6 +84,8 @@ class jetPackWorld extends Phaser.Scene {
     this.load.audio("jump", "Assets/Audio/jump.mp3");
     this.load.image("enemy", "Assets/Images/enemy.png");
     this.load.image("platform", "Assets/Images/platform.png");
+    this.load.image("jumpImg", "Assets/Images/jump.png");
+    this.load.image("arrow", "Assets/Images/arrow.png");
 
     // load tilemap
     this.load.tilemapTiledJSON("map3", "Assets/tilemaps/jetpackWorld.json");
@@ -110,6 +112,12 @@ class jetPackWorld extends Phaser.Scene {
 
     // load the tilemap stuff
     const map = this.make.tilemap({ key: "map3" });
+
+    if (IS_TOUCH) {
+      this.cameras.main.setZoom(1);
+    } else {
+      this.cameras.main.setZoom(1);
+    }
 
     // add the tileset image to the map
     const tileset = map.addTilesetImage("jetWall", "tiles3");
@@ -178,6 +186,18 @@ class jetPackWorld extends Phaser.Scene {
 
     this.isPlayerOnGround = false;
 
+    if (IS_TOUCH) {
+     
+      this.jumpBtn = this.add.image(
+        window.innerWidth * 0.9,
+        window.innerHeight * 0.8,
+        "jumpImg"
+      )
+      .setInteractive({capture: false})
+      .setScrollFactor(0)
+      .setDepth(5);
+    }
+
     this.coins = this.physics.add.group({
       key: "coin",
       repeat: 100, // Number of coins to create
@@ -240,6 +260,7 @@ class jetPackWorld extends Phaser.Scene {
   }
 
   update() {
+    if(!IS_TOUCH){
     if (
       this.cursors.up.isDown ||
       this.keys.W.isDown ||
@@ -247,10 +268,32 @@ class jetPackWorld extends Phaser.Scene {
       this.input.activePointer.isDown
     ) {
       this.player.setVelocityY(-600); // Adjust the value as needed
+      }
+    } else {
+      if (
+        this.input.activePointer.leftButtonDown() &&
+        this.input.activePointer.x > this.sys.game.config.width / 1.5 &&
+        this.input.activePointer.y > this.sys.game.config.height / 3
+      ) {
+        this.player.setVelocityY(-600); // Adjust the value as needed
+      }
     }
 
     this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
-    this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
+     if (IS_TOUCH) {
+      this.cameras.main.scrollY = 550;
+      if (
+        this.input.activePointer.leftButtonDown() &&
+        this.isPlayerOnGround &&
+        this.input.activePointer.x > this.sys.game.config.width / 1.5 &&
+        this.input.activePointer.y > this.sys.game.config.height / 3
+      ) {
+        this.jump();
+        this.isPlayerOnGround = false;
+      }
+    } else {
+      this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
+    }
 
     this.player.setVelocityX(500); // Adjust the value as needed
 

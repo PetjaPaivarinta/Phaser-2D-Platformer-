@@ -120,11 +120,24 @@ class GDWorld extends Phaser.Scene {
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
-    this.scoreText = this.add.text(650, 350, "TESTINGSIFJ ISNDFHSIUFHGBU", {
-      fontSize: "200px",
-      fill: "#000",
-      fontWeight: "bold",
-    });
+     if (IS_TOUCH) {
+      this.scoreText = this.add.text(
+        window.innerWidth * 0.06,
+        window.innerHeight * 0.2,
+        "Score: ",
+        {
+          fontSize: "200px",
+          fill: "#000",
+          fontWeight: "bold",
+        }
+      );
+    } else {
+      this.scoreText = this.add.text(650, 350, "Score: ", {
+        fontSize: "200px",
+        fill: "#000",
+        fontWeight: "bold",
+      });
+    }
     this.scoreText.setScrollFactor(0);
     this.scoreText.setText("Score: " + scoreManager.getScore());
     this.scoreText.setDepth(1);

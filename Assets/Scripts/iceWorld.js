@@ -84,6 +84,8 @@ class iceWorld extends Phaser.Scene {
     this.load.audio("jump", "Assets/Audio/jump.mp3");
     this.load.image("lava2", "Assets/Images/water.jpg");
     this.load.image("platform", "Assets/Images/platform.png");
+    this.load.image("jumpImg", "Assets/Images/jump.png");
+    this.load.image("arrow", "Assets/Images/arrow.png");
 
     for (let i = 0; i < 100; i++) {
       this.load.image("coin" + i, "Assets/Images/coin.png");
@@ -119,18 +121,31 @@ class iceWorld extends Phaser.Scene {
     const tileset = map.addTilesetImage("ice", "tiles2");
 
     // create the layers
-    const layer = map.createLayer("Ground", tileset, 0, 0);
-    const notGroundLayer = map.createLayer("Tile Layer 1", tileset, 0, 0);
+    const layer = map.createLayer("Ground", tileset, -100, 100);
+    const notGroundLayer = map.createLayer("Tile Layer 1", tileset, -100, 100);
 
     notGroundLayer.setCollisionBetween(0, 10000);
     layer.setCollisionBetween(0, 100);
 
     // create the score text and set it to follow the camera
-    this.scoreText = this.add.text(500, 300, "", {
-      fontSize: "200px",
-      fill: "#000",
-      fontWeight: "bold",
-    });
+     if (IS_TOUCH) {
+      this.scoreText = this.add.text(
+        window.innerWidth * 0.06,
+        window.innerHeight * 0.2,
+        "Score: ",
+        {
+          fontSize: "200px",
+          fill: "#000",
+          fontWeight: "bold",
+        }
+      );
+    } else {
+      this.scoreText = this.add.text(500, 300, "Score: ", {
+        fontSize: "200px",
+        fill: "#000",
+        fontWeight: "bold",
+      });
+    }
     this.scoreText.setScrollFactor(0);
     this.scoreText.setText("Score: " + scoreManager.getScore());
     this.scoreText.setDepth(1);
@@ -138,12 +153,11 @@ class iceWorld extends Phaser.Scene {
 
     // create the lava2
     this.lava2 = this.physics.add.image(
-      this.sys.game.config.width / 2,
-      this.sys.game.config.height / 1.5 + 225,
+      800,
+      1050,
       "lava2"
-    );
+    ).setScale(10, 1)
     this.lava2.setDepth(5);
-    this.lava2.setScale(10, 0.5);
     this.lava2.body.setAllowGravity(false);
     this.lava2.setImmovable(true);
 
@@ -203,19 +217,13 @@ class iceWorld extends Phaser.Scene {
 
     // create the player
     // Assuming 'player' is your player object
-    this.player = this.physics.add.sprite(950, 600, "start player");
+    this.player = this.physics.add.sprite(800, 700, "start player");
     this.player.setScale(0.15);
 
     this.player.setDrag(100, 0);
     this.player.setMaxVelocity(300, 500);
     this.physics.add.collider(this.lava2, this.player, () => {
-      this.player.y = 600;
-      this.player.x = 950;
-      this.cameras.main.setZoom(2);
-
-      this.player.setVelocityY(0);
-      this.scoreText.setText("Score: " + scoreManager.getScore());
-      scoreManager.score = Math.floor(scoreManager.score / 2);
+    this.scene.start("DeathMenu");
     }),
       this.physics.add.collider(
         this.player,
@@ -226,14 +234,56 @@ class iceWorld extends Phaser.Scene {
         null,
         this
       );
+    
+    if (IS_TOUCH) {
+      this.cameras.main.setZoom(1);
+    } else {
+      this.cameras.main.setZoom(2);
+    }
+    if (IS_TOUCH) {
+      this.rightBtn = this.add
+        .image(window.innerWidth * 0.15, window.innerHeight * 0.8, "arrow")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDepth(5);
+      this.rightBtn.angle = 180;
+      this.rightBtn
+        .on(
+          "pointerdown",
+          function () {
+            this.moveRight();
+          },
+          this
+        )
+      this.leftBtn = this.add
+        .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDepth(5);
+      this.leftBtn
+        .on(
+          "pointerdown",
+          function () {
+            this.moveLeft();
+          },
+          this
+        )
+      this.jumpBtn = this.add.image(
+        window.innerWidth * 0.9,
+        window.innerHeight * 0.8,
+        "jumpImg"
+      );
+      this.jumpBtn.setScrollFactor(0);
+      this.jumpBtn.setDepth(5);
+    }
 
     this.physics.add.collider(this.player, notGroundLayer, () => {
      this.scene.start("DeathMenu");
     });
 
-    this.physics.add.collider(this.player, this.platforms, () => {});
-
-    this.cameras.main.setZoom(2);
+    this.physics.add.collider(this.player, this.platforms, () => {
+      this.scene.start('DeathMenu')
+    });
 
     this.coins = this.physics.add.group({
       key: "coin",
@@ -279,6 +329,20 @@ class iceWorld extends Phaser.Scene {
   }
 
   update() {
+     if (IS_TOUCH) {
+      this.cameras.main.scrollY = 500;
+      if (
+        this.input.activePointer.leftButtonDown() &&
+        this.isPlayerOnGround &&
+        this.input.activePointer.x > this.sys.game.config.width / 1.5 &&
+        this.input.activePointer.y > this.sys.game.config.height / 3
+      ) {
+        this.jump();
+        this.isPlayerOnGround = false;
+      }
+    } else {
+      this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
+    }
     if (this.player.body.velocity.y > 200 && this.isPlayerOnGround) {
       this.isPlayerOnGround = false;
     }
@@ -311,29 +375,26 @@ class iceWorld extends Phaser.Scene {
       this.scene.start("jetPackWorld");
     }
 
-    // move the player left and right
-    if (this.input.keyboard.addKey("A").isDown) {
-      this.background.tilePositionX += 1.5;
+    if (!IS_TOUCH) {
+      if (this.input.keyboard.addKey("A").isDown) {
+        this.moveLeft();
+      } else if (this.input.keyboard.addKey("D").isDown) {
+        this.moveRight();
+      }
+      if (this.input.keyboard.addKey("Space").isDown && this.isPlayerOnGround) {
+        // jump
+        this.jump();
+        this.isPlayerOnGround = false;
+      }
+    }
 
-      this.player.setVelocityX(-300);
-    } else if (this.input.keyboard.addKey("D").isDown) {
-      this.player.setVelocityX(300);
-      this.background.tilePositionX -= 1.5;
-    }
-    if (this.input.keyboard.addKey("Space").isDown && this.isPlayerOnGround) {
-      // jump
-      this.jump();
-      this.isPlayerOnGround = false;
-    }
 
     if (this.player.x > 4300) {
       this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
       this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
       this.cameras.main.zoomTo(1);
     } else {
-      this.cameras.main.setZoom(2)
       this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
-      this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
     }
 
     if (this.frameCounter % 15 === 0) {
@@ -346,5 +407,17 @@ class iceWorld extends Phaser.Scene {
   jump() {
     this.player.setVelocityY(-500);
     this.jumpSound.play();
+  }
+   moveLeft() {
+    console.log("moving left");
+    this.player.setVelocityX(-300);
+  }
+
+  moveRight() {
+    console.log("moving right");
+    this.player.setVelocityX(300);
+  }
+  stopMoving() {
+    this.player.setVelocityX(0);
   }
 }

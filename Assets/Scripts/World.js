@@ -165,7 +165,6 @@ class World extends Phaser.Scene {
     //this.lava.preFX.addGlow();
     this.lava.postFX.addGlow(["#ffffff"], [15], [2], [false]);
 
-
     // create the player
     this.player = this.physics.add.image(800, 700, "start player");
     this.player.setScale(0.15);
@@ -189,35 +188,47 @@ class World extends Phaser.Scene {
       this.cameras.main.setZoom(2);
     }
     if (IS_TOUCH) {
-      this.rightBtn = this.add.image(
-        window.innerWidth * 0.15,
-        window.innerHeight * 0.8,
-        "arrow"
-      );
-      this.rightBtn.setInteractive();
-      this.rightBtn.setScrollFactor(0);
-      this.rightBtn.setDepth(5);
+      this.rightBtn = this.add
+        .image(window.innerWidth * 0.15, window.innerHeight * 0.8, "arrow")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDepth(5);
       this.rightBtn.angle = 180;
       this.rightBtn
-        .on("pointerdown", function () {
-          this.player.setVelocityX(300);
-        })
-        .on("pointerup", function () {
-          this.player.setVelocityX(0);
-        });
-      this.leftBtn = this.add.image(
-        window.innerWidth * 0.06,
-        window.innerHeight * 0.8,
-        "arrow"
-      );
-      this.leftBtn.setInteractive();
-      this.leftBtn.setScrollFactor(0);
-      this.leftBtn.setDepth(5);
-       this.leftBtn
-         .on("pointerdown", this.moveLeft)
-         .on("pointerup", function () {
-           this.player.setVelocityX(0);
-         });
+        .on(
+          "pointerdown",
+          function () {
+            this.moveRight();
+          },
+          this
+        )
+        .on(
+          "pointerup",
+          function () {
+            this.stopMoving();
+          },
+          this
+        );
+      this.leftBtn = this.add
+        .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
+        .setInteractive()
+        .setScrollFactor(0)
+        .setDepth(5);
+      this.leftBtn
+        .on(
+          "pointerdown",
+          function () {
+            this.moveLeft();
+          },
+          this
+        )
+        .on(
+          "pointerup",
+          function () {
+            this.stopMoving();
+          },
+          this
+        );
       this.jumpBtn = this.add.image(
         window.innerWidth * 0.9,
         window.innerHeight * 0.8,
@@ -264,8 +275,6 @@ class World extends Phaser.Scene {
 
     scoreManager.increaseScore(10),
       this.scoreText.setText("Score: " + scoreManager.getScore());
-    
-    
   }
 
   update() {
@@ -305,8 +314,6 @@ class World extends Phaser.Scene {
       ); // the third parameter is `once`, which means the event listener will be removed after being triggered
     }
 
-    
-
     if (this.player.x > 5500) {
       this.scene.start("iceWorld");
     }
@@ -320,7 +327,7 @@ class World extends Phaser.Scene {
       } else if (this.input.keyboard.addKey("D").isDown) {
         this.moveRight();
       } else {
-        this.player.setVelocityX(0);
+        this.stopMoving();
       }
       if (this.input.keyboard.addKey("Space").isDown && this.isPlayerOnGround) {
         // jump
@@ -348,5 +355,8 @@ class World extends Phaser.Scene {
   moveRight() {
     console.log("moving right");
     this.player.setVelocityX(300);
+  }
+  stopMoving() {
+    this.player.setVelocityX(0);
   }
 }

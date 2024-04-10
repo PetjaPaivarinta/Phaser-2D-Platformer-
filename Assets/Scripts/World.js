@@ -190,7 +190,7 @@ class World extends Phaser.Scene {
     if (IS_TOUCH) {
       this.rightBtn = this.add
         .image(window.innerWidth * 0.15, window.innerHeight * 0.8, "arrow")
-        .setInteractive()
+        .setInteractive({capture: false})
         .setScrollFactor(0)
         .setDepth(5);
       this.rightBtn.angle = 180;
@@ -211,7 +211,7 @@ class World extends Phaser.Scene {
         );
       this.leftBtn = this.add
         .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
-        .setInteractive()
+        .setInteractive({capture: false})
         .setScrollFactor(0)
         .setDepth(5);
       this.leftBtn
@@ -233,9 +233,10 @@ class World extends Phaser.Scene {
         window.innerWidth * 0.9,
         window.innerHeight * 0.8,
         "jumpImg"
-      );
-      this.jumpBtn.setScrollFactor(0);
-      this.jumpBtn.setDepth(5);
+      )
+      .setInteractive({capture: false})
+      .setScrollFactor(0)
+      .setDepth(5);
     }
     this.coins = this.physics.add.group({
       key: "coin",

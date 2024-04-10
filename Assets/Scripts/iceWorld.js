@@ -366,9 +366,6 @@ class iceWorld extends Phaser.Scene {
       } else if (this.isJumpButtonDown && this.isPlayerOnGround) {
         this.jump();
         this.isPlayerOnGround = false;
-      } else if
-        (!this.isLeftButtonDown && !this.isRightButtonDown) {
-        this.stopMoving();
       }
     }
      if (IS_TOUCH) {

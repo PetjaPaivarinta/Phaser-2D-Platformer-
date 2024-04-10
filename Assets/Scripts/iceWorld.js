@@ -247,27 +247,27 @@ class iceWorld extends Phaser.Scene {
         .setScrollFactor(0)
         .setDepth(5);
       this.rightBtn.angle = 180;
-      this.rightBtn
-        .on(
-          "pointerdown",
-          function () {
-            this.moveRight();
-          },
-          this
-        )
+      // this.rightBtn
+      //   .on(
+      //     "pointerdown",
+      //     function () {
+      //       this.moveRight();
+      //     },
+      //     this
+      //   )
       this.leftBtn = this.add
         .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
         .setInteractive()
         .setScrollFactor(0)
         .setDepth(5);
-      this.leftBtn
-        .on(
-          "pointerdown",
-          function () {
-            this.moveLeft();
-          },
-          this
-        )
+      // this.leftBtn
+      //   .on(
+      //     "pointerdown",
+      //     function () {
+      //       this.moveLeft();
+      //     },
+      //     this
+      //   )
       this.jumpBtn = this.add.image(
         window.innerWidth * 0.9,
         window.innerHeight * 0.8,
@@ -362,6 +362,12 @@ class iceWorld extends Phaser.Scene {
         true
       ); // the third parameter is `once`, which means the event listener will be removed after being triggered
     }
+
+    if (this.leftBtn.isDown) {
+    this.moveLeft();
+  } else if (this.rightBtn.isDown) {
+    this.moveRight();
+  }
 
     this.frameCounter++;
 

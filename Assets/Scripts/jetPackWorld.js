@@ -281,7 +281,7 @@ class jetPackWorld extends Phaser.Scene {
 
     this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
      if (IS_TOUCH) {
-      this.cameras.main.scrollY = 550;
+      this.cameras.main.scrollY = 570;
       if (
         this.input.activePointer.leftButtonDown() &&
         this.isPlayerOnGround &&

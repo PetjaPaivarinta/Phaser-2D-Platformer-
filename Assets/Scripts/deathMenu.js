@@ -78,7 +78,7 @@ class DeathMenu extends Phaser.Scene {
       .setDepth(2);
     this.scoreText.setText("Total Score: " + scoreManager.getScore());
     if (scoreManager.score == 0) {
-      this.scoreText.setText("You ass kid LVL whatever the fuck");
+      this.scoreText.setText("You ass kid LVL try againsdfisdf");
     }
   }
 

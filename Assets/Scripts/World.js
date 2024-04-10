@@ -116,7 +116,7 @@ class World extends Phaser.Scene {
       .setScale(0.2);
     this.jumpSound = this.sound.add("jump");
 
-    InputPlugin.addPointer();
+   this.input.addPointer(7);
 
     // is grounded
     this.isPlayerOnGround = false;

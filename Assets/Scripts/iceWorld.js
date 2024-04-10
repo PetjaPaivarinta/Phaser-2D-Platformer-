@@ -254,40 +254,35 @@ class iceWorld extends Phaser.Scene {
         .setDepth(5);
       this.rightBtn.angle = 180;
       this.rightBtn
-        .on(
-          "pointerdown",
-          function () {
-           this.isRightButtonDown = true;
-          },
-          this
-        )
-        .on(
-          "pointerup",
-          function () {
-            this.isRightButtonDown = false;
-          },
-          this
-        );
-      this.leftBtn = this.add
-        .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
-        .setInteractive()
-        .setScrollFactor(0)
-        .setDepth(5);
+  .on('pointerdown', function (pointer) {
+    if (pointer.pointerId === 1) {
+      this.isRightButtonDown = true;
+    } else if (pointer.pointerId === 2) {
+      this.isJumpButtonDown = true;
+    }
+  }, this)
+  .on('pointerup', function (pointer) {
+    if (pointer.pointerId === 1) {
+      this.isRightButtonDown = false;
+    } else if (pointer.pointerId === 2) {
+      this.isJumpButtonDown = false;
+    }
+  }, this);
       this.leftBtn
-        .on(
-          "pointerdown",
-          function () {
-            this.isLeftButtonDown = true;
-          },
-          this
-        )
-        .on(
-          "pointerup",
-          function () {
-            this.isLeftButtonDown = false;
-          },
-          this
-        );
+  .on('pointerdown', function (pointer) {
+    if (pointer.pointerId === 1) {
+      this.isLeftButtonDown = true;
+    } else if (pointer.pointerId === 2) {
+      this.isJumpButtonDown = true;
+    }
+  }, this)
+  .on('pointerup', function (pointer) {
+    if (pointer.pointerId === 1) {
+      this.isLeftButtonDown = false;
+    } else if (pointer.pointerId === 2) {
+      this.isJumpButtonDown = false;
+    }
+  }, this);
       this.jumpBtn = this.add.image(
         window.innerWidth * 0.9,
         window.innerHeight * 0.8,
@@ -296,11 +291,11 @@ class iceWorld extends Phaser.Scene {
       .setInteractive()
       .setScrollFactor(0)
         .setDepth(5);
-      this.jumpBtn
-  .on('pointerdown', function () {
+     this.jumpBtn
+  .on('pointerdown', function (pointer) {
     this.isJumpButtonDown = true;
   }, this)
-  .on('pointerup', function () {
+  .on('pointerup', function (pointer) {
     this.isJumpButtonDown = false;
   }, this);
     }

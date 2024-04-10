@@ -181,6 +181,12 @@ class World extends Phaser.Scene {
         null,
         this
       );
+    
+    if (IS_TOUCH) {
+      this.isLeftButtonDown = false;
+      this.isRightButtonDown = false;
+      this.isJumpButtonDown = false;
+    }
 
     if (IS_TOUCH) {
       this.cameras.main.setZoom(1);
@@ -194,41 +200,41 @@ class World extends Phaser.Scene {
         .setScrollFactor(0)
         .setDepth(5);
       this.rightBtn.angle = 180;
-      // this.rightBtn
-      //   .on(
-      //     "pointerdown",
-      //     function () {
-      //       this.moveRight();
-      //     },
-      //     this
-      //   )
-      //   .on(
-      //     "pointerup",
-      //     function () {
-      //       this.stopMoving();
-      //     },
-      //     this
-      //   );
+      this.rightBtn
+        .on(
+          "pointerdown",
+          function () {
+           this.isRightButtonDown = true;
+          },
+          this
+        )
+        .on(
+          "pointerup",
+          function () {
+            this.isRightButtonDown = false;
+          },
+          this
+        );
       this.leftBtn = this.add
         .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
         .setInteractive({capture: false})
         .setScrollFactor(0)
         .setDepth(5);
-      // this.leftBtn
-      //   .on(
-      //     "pointerdown",
-      //     function () {
-      //       this.moveLeft();
-      //     },
-      //     this
-      //   )
-      //   .on(
-      //     "pointerup",
-      //     function () {
-      //       this.stopMoving();
-      //     },
-      //     this
-      //   );
+      this.leftBtn
+        .on(
+          "pointerdown",
+          function () {
+            this.isLeftButtonDown = true;
+          },
+          this
+        )
+        .on(
+          "pointerup",
+          function () {
+            this.isLeftButtonDown = false;
+          },
+          this
+        );
       this.jumpBtn = this.add.image(
         window.innerWidth * 0.9,
         window.innerHeight * 0.8,
@@ -279,6 +285,16 @@ class World extends Phaser.Scene {
   }
 
   update() {
+
+    if (IS_TOUCH) {
+      if (this.isLeftButtonDown) {
+        this.moveLeft();
+      } else if (this.isRightButtonDown) {
+        this.moveRight();
+      } else if (!this.isLeftButtonDown && !this.isRightButtonDown) {
+        this.stopMoving();
+      }
+    }
     if (this.player.body.velocity.y > 200 && this.isPlayerOnGround) {
       this.isPlayerOnGround = false;
     }

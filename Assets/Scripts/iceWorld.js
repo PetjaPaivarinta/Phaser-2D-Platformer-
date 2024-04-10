@@ -215,6 +215,12 @@ class iceWorld extends Phaser.Scene {
       repeat: -1,
     });
 
+    if (IS_TOUCH) {
+      this.isLeftButtonDown = false;
+      this.isRightButtonDown = false;
+      this.isJumpButtonDown = false;
+    }
+
     // create the player
     // Assuming 'player' is your player object
     this.player = this.physics.add.sprite(800, 700, "start player");
@@ -240,10 +246,10 @@ class iceWorld extends Phaser.Scene {
     } else {
       this.cameras.main.setZoom(2);
     }
-    if (IS_TOUCH) {
+     if (IS_TOUCH) {
       this.rightBtn = this.add
         .image(window.innerWidth * 0.15, window.innerHeight * 0.8, "arrow")
-        .setInteractive()
+        .setInteractive({capture: false})
         .setScrollFactor(0)
         .setDepth(5);
       this.rightBtn.angle = 180;
@@ -251,30 +257,52 @@ class iceWorld extends Phaser.Scene {
         .on(
           "pointerdown",
           function () {
-            this.moveRight();
+           this.isRightButtonDown = true;
           },
           this
         )
+        .on(
+          "pointerup",
+          function () {
+            this.isRightButtonDown = false;
+          },
+          this
+        );
       this.leftBtn = this.add
         .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
-        .setInteractive()
+        .setInteractive({capture: false})
         .setScrollFactor(0)
         .setDepth(5);
       this.leftBtn
         .on(
           "pointerdown",
           function () {
-            this.moveLeft();
+            this.isLeftButtonDown = true;
           },
           this
         )
+        .on(
+          "pointerup",
+          function () {
+            this.isLeftButtonDown = false;
+          },
+          this
+        );
       this.jumpBtn = this.add.image(
         window.innerWidth * 0.9,
         window.innerHeight * 0.8,
         "jumpImg"
-      );
-      this.jumpBtn.setScrollFactor(0);
-      this.jumpBtn.setDepth(5);
+      )
+      .setInteractive({capture: false})
+      .setScrollFactor(0)
+        .setDepth(5);
+      this.jumpBtn
+  .on('pointerdown', function () {
+    this.isJumpButtonDown = true;
+  }, this)
+  .on('pointerup', function () {
+    this.isJumpButtonDown = false;
+  }, this);
     }
 
     this.physics.add.collider(this.player, notGroundLayer, () => {
@@ -329,17 +357,22 @@ class iceWorld extends Phaser.Scene {
   }
 
   update() {
-     if (IS_TOUCH) {
-      this.cameras.main.scrollY = 500;
-      if (
-        this.input.activePointer.leftButtonDown() &&
-        this.isPlayerOnGround &&
-        this.input.activePointer.x > this.sys.game.config.width / 1.5 &&
-        this.input.activePointer.y > this.sys.game.config.height / 3
-      ) {
+
+    if (IS_TOUCH) {
+      if (this.isLeftButtonDown) {
+        this.moveLeft();
+      } else if (this.isRightButtonDown) {
+        this.moveRight();
+      } else if (this.isJumpButtonDown && this.isPlayerOnGround) {
         this.jump();
         this.isPlayerOnGround = false;
+      } else if
+        (!this.isLeftButtonDown && !this.isRightButtonDown) {
+        this.stopMoving();
       }
+    }
+     if (IS_TOUCH) {
+      this.cameras.main.scrollY = 500;
     } else {
       this.cameras.main.scrollY = 150; // replace 'someFixedValue' with the desired y position
     }

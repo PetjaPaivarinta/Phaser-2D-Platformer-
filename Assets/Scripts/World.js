@@ -321,11 +321,6 @@ class World extends Phaser.Scene {
       this.isPaused = true;
       console.log("pause");
 
-       if (this.leftBtn.isDown) {
-    this.moveLeft();
-  } else if (this.rightBtn.isDown) {
-    this.moveRight();
-  }
 
       this.escapeKey.on(
         "up",

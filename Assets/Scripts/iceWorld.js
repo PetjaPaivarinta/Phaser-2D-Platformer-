@@ -249,41 +249,41 @@ class iceWorld extends Phaser.Scene {
      if (IS_TOUCH) {
       this.rightBtn = this.add
         .image(window.innerWidth * 0.15, window.innerHeight * 0.8, "arrow")
-        .setInteractive({capture: false})
+        .setInteractive()
         .setScrollFactor(0)
         .setDepth(5);
       this.rightBtn.angle = 180;
       this.rightBtn
         .on(
           "pointerdown",
-          function (pointer) {
+          function () {
            this.isRightButtonDown = true;
           },
           this
         )
         .on(
           "pointerup",
-          function (pointer) {
+          function () {
             this.isRightButtonDown = false;
           },
           this
         );
       this.leftBtn = this.add
         .image(window.innerWidth * 0.06, window.innerHeight * 0.8, "arrow")
-        .setInteractive({capture: false})
+        .setInteractive()
         .setScrollFactor(0)
         .setDepth(5);
       this.leftBtn
         .on(
           "pointerdown",
-          function (pointer) {
+          function () {
             this.isLeftButtonDown = true;
           },
           this
         )
         .on(
           "pointerup",
-          function (pointer) {
+          function () {
             this.isLeftButtonDown = false;
           },
           this
@@ -293,14 +293,14 @@ class iceWorld extends Phaser.Scene {
         window.innerHeight * 0.8,
         "jumpImg"
       )
-      .setInteractive({capture: false})
+      .setInteractive()
       .setScrollFactor(0)
         .setDepth(5);
       this.jumpBtn
-  .on('pointerdown', function (pointer) {
+  .on('pointerdown', function () {
     this.isJumpButtonDown = true;
   }, this)
-  .on('pointerup', function (pointer) {
+  .on('pointerup', function () {
     this.isJumpButtonDown = false;
   }, this);
     }

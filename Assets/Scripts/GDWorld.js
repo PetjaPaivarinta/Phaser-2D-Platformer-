@@ -83,6 +83,7 @@ class GDWorld extends Phaser.Scene {
     this.load.image("enemy", "Assets/Images/enemy.png");
     this.load.image("platform", "Assets/Images/platform.png");
     this.load.image("jumpImg", "Assets/Images/jump.png");
+    this.load.audio('coinSound', 'Assets/Audio/CoinSFX.mp3');
 
     // load tilemap
     this.load.tilemapTiledJSON("map4", "Assets/tilemaps/GDWorldMap.json");
@@ -240,7 +241,8 @@ class GDWorld extends Phaser.Scene {
 
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
-
+    this.coinSound = this.sound.add('coinSound');
+    this.coinSound.play();
     scoreManager.increaseScore(10),
       this.scoreText.setText("Score: " + scoreManager.getScore());
   }

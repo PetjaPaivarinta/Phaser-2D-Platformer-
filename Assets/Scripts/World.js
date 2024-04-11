@@ -83,6 +83,7 @@ class World extends Phaser.Scene {
     this.load.image("arrow", "Assets/Images/arrow.png");
     this.load.image("lava", "Assets/Images/lava.png");
     this.load.image("jumpImg", "Assets/Images/jump.png");
+    this.load.audio('coinSound', 'Assets/Audio/CoinSFX.mp3');
 
     for (let i = 0; i < 100; i++) {
       this.load.image("coin" + i, "Assets/Images/coin.png");
@@ -288,7 +289,8 @@ class World extends Phaser.Scene {
 
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
-
+    this.coinSound = this.sound.add('coinSound');
+    this.coinSound.play();
     scoreManager.increaseScore(10),
       this.scoreText.setText("Score: " + scoreManager.getScore());
   }

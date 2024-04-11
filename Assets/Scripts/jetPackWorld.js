@@ -86,6 +86,7 @@ class jetPackWorld extends Phaser.Scene {
     this.load.image("platform", "Assets/Images/platform.png");
     this.load.image("jumpImg", "Assets/Images/jump.png");
     this.load.image("arrow", "Assets/Images/arrow.png");
+    this.load.audio('coinSound', 'Assets/Audio/CoinSFX.mp3');
 
     // load tilemap
     this.load.tilemapTiledJSON("map3", "Assets/tilemaps/jetpackWorld.json");
@@ -254,7 +255,8 @@ class jetPackWorld extends Phaser.Scene {
 
   collectCoin(player, coin) {
     coin.disableBody(true, true); // This will hide and disable the coin
-
+    this.coinSound = this.sound.add('coinSound');
+    this.coinSound.play();
     scoreManager.increaseScore(10),
       this.scoreText.setText("Score: " + scoreManager.getScore());
   }

@@ -1,6 +1,6 @@
-class DeathMenu extends Phaser.Scene {
+class FinishScreen extends Phaser.Scene {
   constructor() {
-    super({ key: "DeathMenu" });
+    super({ key: "FinishScreen" });
   }
   preload() {}
 
@@ -14,11 +14,11 @@ class DeathMenu extends Phaser.Scene {
       .text(
         this.sys.game.config.width / 2,
         this.sys.game.config.height / 2 - 300,
-        "Game Over",
+        "YOU WON",
         {
           fontFamily: "Impact",
           fontSize: "120px",
-          color: "#8B0000",
+          color: "#FFFF00",
           fontWeight: "bold",
         }
       )
@@ -97,7 +97,7 @@ class DeathMenu extends Phaser.Scene {
           500
         )
       ) {
-        this.scene.start("GDWorld");
+        this.scene.start("GameScene");
         scoreManager.score = 0;
       }
     } else {

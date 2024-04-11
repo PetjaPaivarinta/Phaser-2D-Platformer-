@@ -241,7 +241,8 @@ class GDWorld extends Phaser.Scene {
       this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
     }
 
-    this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2;
+    this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2.5;
+
 
     if (Phaser.Input.Keyboard.JustDown(this.escapeKey) && !this.isPaused) {
       this.scene.pause();
@@ -294,6 +295,12 @@ class GDWorld extends Phaser.Scene {
         duration: 300,
       });
       this.groundCounter--;
+    }
+
+      console.log(this.player.x)
+
+    if (this.player.x > 8500) {
+      this.scene.start('FinishScreen')
     }
 
     // rotate the player

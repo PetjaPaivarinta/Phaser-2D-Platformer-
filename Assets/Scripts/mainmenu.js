@@ -83,7 +83,7 @@ class MainMenu extends Phaser.Scene {
       this.input.activePointer.y > this.sys.game.config.height / 2 - 50 &&
       this.input.activePointer.y < this.sys.game.config.height / 2 + 50
     ) {
-      this.scene.start("iceWorld");
+      this.scene.start("GDWorld");
       if (IS_TOUCH) {
         console.log("Phone");
       } else {

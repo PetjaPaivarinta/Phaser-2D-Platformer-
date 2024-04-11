@@ -82,6 +82,7 @@ class GDWorld extends Phaser.Scene {
     this.load.audio("jump", "Assets/Audio/jump.mp3");
     this.load.image("enemy", "Assets/Images/enemy.png");
     this.load.image("platform", "Assets/Images/platform.png");
+    this.load.image("jumpImg", "Assets/Images/jump.png");
 
     // load tilemap
     this.load.tilemapTiledJSON("map4", "Assets/tilemaps/GDWorldMap.json");
@@ -143,6 +144,18 @@ class GDWorld extends Phaser.Scene {
     this.scoreText.setDepth(1);
     this.scoreText.setScale(0.1);
 
+     if (IS_TOUCH) {
+     this.cameras.main.scrollY = 170;
+      this.jumpBtn = this.add.image(
+        window.innerWidth * 0.9,
+        window.innerHeight * 0.8,
+        "jumpImg"
+      )
+      .setInteractive({capture: false})
+      .setScrollFactor(0)
+      .setDepth(5);
+    }
+
     // create the player
     // Assuming 'player' is your player object
     this.player = this.physics.add.sprite(
@@ -162,7 +175,11 @@ class GDWorld extends Phaser.Scene {
       this
     );
 
-    this.cameras.main.setZoom(3);
+    if (IS_TOUCH) {
+      this.cameras.main.setZoom(1);
+    } else {
+      this.cameras.main.setZoom(3);
+    }
 
     this.physics.add.collider(this.player, notGroundLayer, () => {
             this.scene.start("DeathMenu");
@@ -237,12 +254,32 @@ class GDWorld extends Phaser.Scene {
       });
     }
 
+    if (IS_TOUCH) {
+
+      if (
+        this.input.activePointer.leftButtonDown() &&
+        this.isPlayerOnGround &&
+        !this.isJumping &&
+        this.input.activePointer.x > this.sys.game.config.width / 1.5 &&
+        this.input.activePointer.y > this.sys.game.config.height / 3
+      ) {
+        this.jump();
+        this.isJumping = true;
+        this.time.delayedCall(301, () => {
+          this.isJumping = false;
+        });
+      }
+    }
+
     if (this.player.x > 6500) {
       this.cameras.main.scrollY = this.player.y - this.cameras.main.height / 2;
     }
 
-    this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2.5;
-
+    if (!IS_TOUCH) {
+      this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 2.5;
+    } else {
+      this.cameras.main.scrollX = this.player.x - this.cameras.main.width / 4;
+    }
 
     if (Phaser.Input.Keyboard.JustDown(this.escapeKey) && !this.isPaused) {
       this.scene.pause();
@@ -277,6 +314,9 @@ class GDWorld extends Phaser.Scene {
     if (this.frameCounter % 30 === 0) {
       this.player.setTexture("start player");
     }
+     if (this.player.x > 2500) {
+      this.scene.start('FinishScreen')
+    }
   }
   jump() {
     if (this.groundCounter == 0) {
@@ -295,12 +335,6 @@ class GDWorld extends Phaser.Scene {
         duration: 300,
       });
       this.groundCounter--;
-    }
-
-      console.log(this.player.x)
-
-    if (this.player.x > 8500) {
-      this.scene.start('FinishScreen')
     }
 
     // rotate the player

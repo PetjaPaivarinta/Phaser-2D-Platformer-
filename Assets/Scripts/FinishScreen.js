@@ -5,6 +5,8 @@ class FinishScreen extends Phaser.Scene {
   preload() {}
 
   create() {
+
+    this.PBScore = 0;
     // add title text
 
     if (IS_TOUCH) {
@@ -51,7 +53,7 @@ class FinishScreen extends Phaser.Scene {
       .text(
         this.sys.game.config.width / 2,
         this.sys.game.config.height / 2,
-        "Restart",
+        "Try Again",
         {
           fontFamily: "Impact",
           fontSize: "80px",
@@ -61,6 +63,25 @@ class FinishScreen extends Phaser.Scene {
       )
       .setOrigin(0.5)
       .setDepth(2);
+    
+     this.PBText = this.add
+      .text(
+        this.sys.game.config.width / 2,
+        this.sys.game.config.height / 2 - 100,
+        "",
+        {
+          fontFamily: "Impact",
+          fontSize: "80px",
+          color: "#FFFF00",
+          fontWeight: "bold",
+        }
+      )
+      .setOrigin(0.5)
+      .setDepth(2);
+      this.PBText.setText("Personal Best: " + this.PBScore)
+    if (scoreManager.score == 0) {
+      this.scoreText.setText("Git Gud");
+    }
 
     this.scoreText = this.add
       .text(
@@ -70,16 +91,22 @@ class FinishScreen extends Phaser.Scene {
         {
           fontFamily: "Impact",
           fontSize: "80px",
-          color: "#8B0000",
+          color: "#FFFF00",
           fontWeight: "bold",
         }
       )
       .setOrigin(0.5)
       .setDepth(2);
-    this.scoreText.setText("Total Score: " + scoreManager.getScore());
+   if (scoreManager.getScore() > this.PBScore) {
+  this.PBText.setText("New Personal Best: " + scoreManager.getScore())
+} else {
+  this.scoreText.setText("Total Score: " + scoreManager.getScore())
+};
     if (scoreManager.score == 0) {
       this.scoreText.setText("You ass kid LVL try FINALf");
     }
+
+
   }
 
   update() {

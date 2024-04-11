@@ -97,7 +97,7 @@ class DeathMenu extends Phaser.Scene {
           500
         )
       ) {
-        this.scene.start("GDWorld");
+        this.scene.start("GameScene");
         scoreManager.score = 0;
       }
     } else {
